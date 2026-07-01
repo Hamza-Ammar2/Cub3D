@@ -11,8 +11,6 @@ int	main(int argc, char **argv)
 		return (1);
 	if (init_game(&game))
 		return (1);
-	/* register hooks + start the mlx loop here */
-	render_frame(&game);
 	mlx_loop(game.mlx);
 	free_game(&game);
 	return (0);

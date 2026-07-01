@@ -1,2 +1,0 @@
-# Copy your libft sources + its Makefile into this folder.
-# The root Makefile calls `make -C libft` to build libft.a first.
