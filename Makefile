@@ -33,7 +33,9 @@ SRCS		= \
 	src/player/movement.c \
 	src/events/hooks.c \
 	src/utils/errors.c \
-	src/utils/free.c
+	src/utils/free.c \
+	src/utils/get_next_line.c \
+	src/utils/get_next_line_utils.c
 
 OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
@@ -41,8 +43,10 @@ OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 #   Libraries                                                                   #
 # ---------------------------------------------------------------------------- #
 LIBFT		= $(LIBFT_DIR)/libft.a
-# Linux (X11) linking. On macOS use: -L$(MLX_DIR) -lmlx -framework OpenGL -framework AppKit
-MLX_FLAGS	= -L$(MLX_DIR) -lmlx -lXext -lX11 -lm
+# Linux (X11) linking against a SYSTEM-installed MiniLibX (headers in
+# /usr/local/include, libmlx.a in /usr/local/lib). The local minilibx/mlx.h
+# wrapper uses #include_next to reach the system header.
+MLX_FLAGS	= -L/usr/local/lib -lmlx -lXext -lX11 -lm
 INCLUDES	= -I$(INC_DIR) -I$(LIBFT_DIR) -I$(MLX_DIR)
 
 # ---------------------------------------------------------------------------- #

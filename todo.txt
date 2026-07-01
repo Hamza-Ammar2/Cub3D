@@ -1,0 +1,139 @@
+==============================================================================
+                        CUB3D - PARSER TODO LIST
+==============================================================================
+
+Scope: everything the parser coder is responsible for.
+Covers: get_next_line, libft/struct plumbing, .cub file parsing, map parsing
+and full map validation.
+NOT in scope: rendering, raycasting, player movement, mlx drawing.
+
+Legend:  [ ] todo   [~] in progress   [x] done
+
+------------------------------------------------------------------------------
+0. PREREQUISITES / PLUMBING
+------------------------------------------------------------------------------
+[ ] Add get_next_line to libft
+    [ ] get_next_line.c + get_next_line_utils.c in libft/
+    [ ] Prototype in libft.h  (char *get_next_line(int fd);)
+    [ ] Add both files to libft/Makefile SRCS
+    [ ] Pick a sane BUFFER_SIZE (e.g. 42 or 4096) via a #define
+    [ ] Make sure it returns line WITH the trailing '\n' (except maybe last line)
+    [ ] Handles: empty file, file with no trailing newline, invalid fd
+
+[ ] Confirm helper functions exist / are needed
+    [ ] ft_split            (already present)
+    [ ] ft_strtrim          (already present - for stripping whitespace)
+    [ ] ft_strcmp           (already present)
+    [ ] ft_isspace          (already present)
+    [ ] ft_atoi             (already present - for color components)
+    [ ] free_split() helper to free a char ** (add to utils if missing)
+
+------------------------------------------------------------------------------
+1. FILE / ARGUMENT HANDLING
+------------------------------------------------------------------------------
+[ ] parse_scene(t_game *game, char *path)   <-- main entry point
+    [ ] Check extension is exactly ".cub" (reject ".cube", "cub", etc.)
+    [ ] Open the file (open + O_RDONLY); error on failure
+    [ ] Reject if path is a directory / cannot be read
+    [ ] Read the file line by line with get_next_line
+    [ ] Dispatch each line:
+        - texture identifier (NO/SO/WE/EA)  -> parse_textures
+        - color identifier   (F/C)          -> parse_colors
+        - map content                       -> collect for parse_map
+        - empty line                        -> allowed BEFORE map only
+    [ ] Enforce: all 6 identifiers (NO SO WE EA F C) present before the map
+    [ ] Enforce: map is the LAST block in the file (nothing after it)
+    [ ] Call validate_map() at the end
+    [ ] Free the gnl line every iteration (no leaks)
+    [ ] Always close the fd
+
+------------------------------------------------------------------------------
+2. TEXTURE PARSING  (parse_textures)
+------------------------------------------------------------------------------
+[ ] Recognize identifiers: NO, SO, WE, EA
+[ ] Store path into config.tex_path[NORTH/SOUTH/WEST/EAST] (use enum e_dir)
+[ ] Trim leading/trailing whitespace around the path
+[ ] Reject duplicate identifier (same one given twice)
+[ ] Reject missing path after identifier
+[ ] Reject garbage after the path (e.g. "NO a.xpm b.xpm")
+[ ] Duplicate the string (ft_strdup) so it survives gnl line free
+[ ] (Optional now) sanity check path ends in ".xpm"
+[ ] Return error code cleanly on any failure
+
+------------------------------------------------------------------------------
+3. COLOR PARSING  (parse_colors)
+------------------------------------------------------------------------------
+[ ] Recognize identifiers: F (floor), C (ceiling)
+[ ] Split the "R,G,B" values on ','
+[ ] Require exactly 3 components
+[ ] Each component: digits only, range 0-255
+[ ] Trim whitespace around each number
+[ ] Pack into int:  (R << 16) | (G << 8) | B
+[ ] Store in config.floor_color / config.ceiling_color
+[ ] Reject duplicate F or C
+[ ] Reject out-of-range / non-numeric / missing components
+[ ] Track "was this color set?" so missing F or C is caught
+
+------------------------------------------------------------------------------
+4. MAP PARSING  (parse_map)
+------------------------------------------------------------------------------
+[ ] Collect all map lines into config.map (char **)
+[ ] Preserve spaces EXACTLY (do NOT trim map lines)
+[ ] Do NOT strip the trailing '\n' silently -> handle it consistently
+[ ] Reject empty lines INSIDE the map body (map must be contiguous)
+[ ] Compute config.map_height (number of rows)
+[ ] Compute config.map_width  (length of the LONGEST row)
+[ ] (Recommended) pad shorter rows to map_width with spaces
+    -> makes flood-fill / bounds checks much simpler
+[ ] NULL-terminate the char ** array
+[ ] Handle allocation failures without leaking
+
+------------------------------------------------------------------------------
+5. MAP VALIDATION  (validate_map)
+------------------------------------------------------------------------------
+[ ] Only allowed characters: '0' '1' 'N' 'S' 'E' 'W' ' '
+[ ] Exactly ONE player start (N/S/E/W) - reject 0 or >1
+[ ] Record player start position + facing:
+    -> config.start_x, config.start_y, config.start_dir
+[ ] Map must be closed / surrounded by walls:
+    [ ] flood-fill from player start over '0' and player cells
+    [ ] if the fill reaches the map edge OR a space -> map is open -> error
+    [ ] (alt: check every walkable cell's 4 neighbours are in-bounds & not ' ')
+[ ] Reject empty map (no map at all)
+[ ] Make sure validation works on non-rectangular maps (hence padding above)
+
+------------------------------------------------------------------------------
+6. ERROR HANDLING & MEMORY
+------------------------------------------------------------------------------
+[ ] Every parse failure prints "Error\n" + a clear message (use error_exit)
+[ ] No leaks on ANY error path (run through valgrind mentally / for real)
+[ ] Free partial allocations if parsing aborts midway
+[ ] free_game already frees config.map + tex_path -> keep it in sync if you
+    add new heap fields to t_config
+
+------------------------------------------------------------------------------
+7. TEST FIXTURES (maps/)
+------------------------------------------------------------------------------
+[ ] maps/valid/     - add more valid maps (big, non-rectangular, extra spaces)
+[ ] maps/invalid/   - cover each failure case, at minimum:
+    [ ] not_closed.cub            (already present)
+    [ ] missing_texture.cub
+    [ ] duplicate_texture.cub
+    [ ] bad_color_range.cub       (e.g. 256,0,0)
+    [ ] bad_color_format.cub      (e.g. 255,0)
+    [ ] two_players.cub
+    [ ] no_player.cub
+    [ ] invalid_char.cub          (e.g. a '2' in the grid)
+    [ ] wrong_extension.cu
+    [ ] empty_file.cub
+    [ ] map_not_last.cub          (identifier after the map block)
+
+------------------------------------------------------------------------------
+NOTES
+------------------------------------------------------------------------------
+- Identifier lines may have leading spaces and any amount of whitespace
+  between the identifier and its value -> parse defensively.
+- Empty lines are allowed between identifiers, but NOT inside the map body.
+- The map can contain spaces that are valid (void areas), so spaces are the
+  tricky part of both parsing and closure validation.
+==============================================================================

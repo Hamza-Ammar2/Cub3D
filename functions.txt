@@ -1,0 +1,426 @@
+==============================================================================
+              CUB3D - PARSER: STEP-BY-STEP FUNCTION BREAKDOWN
+==============================================================================
+
+How to read this file:
+- Each block is one function you will write.
+- Under each function is a plain-language, step-by-step of what goes inside.
+- Return convention for parser functions:  0 = success, 1 = error.
+  On error, call error_exit("message") which already returns 1, so you can
+  do:  return (error_exit("bad color"));
+- IMPORTANT: realloc is NOT allowed in this project. For the growing map we
+  use a linked list (libft t_list) while reading, then convert to char **.
+
+Suggested new files:
+  libft/get_next_line.c
+  libft/get_next_line_utils.c
+  src/parsing/parse_utils.c   (small shared helpers)
+  src/utils/free.c            (already exists - add free_split here)
+
+==============================================================================
+SECTION A - GET_NEXT_LINE
+==============================================================================
+
+------------------------------------------------------------------------------
+char *get_next_line(int fd)
+------------------------------------------------------------------------------
+- Keep a static char *stash (persists between calls, holds leftover text).
+- Guard clause: if fd < 0 or BUFFER_SIZE <= 0 -> return NULL.
+- Call read_and_stash(fd, &stash):
+    -> keeps reading into stash until stash contains a '\n' OR read hits EOF.
+- If stash is NULL or empty -> return NULL (nothing left).
+- Call extract_line(stash) -> returns one line INCLUDING its '\n' (if any).
+- Call trim_stash(&stash) -> removes that first line from stash, keeps the
+  rest for next call.
+- Return the extracted line.
+
+------------------------------------------------------------------------------
+static char *read_and_stash(int fd, char **stash)
+------------------------------------------------------------------------------
+- define: char buffer[BUFFER_SIZE + 1];  int bytes;
+- define: char *tmp;
+- Loop while there is NO '\n' in *stash:
+    - bytes = read(fd, buffer, BUFFER_SIZE);
+    - if bytes < 0 -> free *stash, set *stash = NULL, return NULL (read error).
+    - if bytes == 0 -> break (EOF).
+    - buffer[bytes] = '\0';
+    - tmp = ft_strjoin(*stash, buffer);   (handle *stash possibly NULL)
+    - free(*stash); *stash = tmp;
+    - if join failed -> return NULL.
+- return *stash.
+
+------------------------------------------------------------------------------
+static char *extract_line(char *stash)
+------------------------------------------------------------------------------
+- if stash is NULL or stash[0] == '\0' -> return NULL.
+- define: int i = 0;
+- advance i until stash[i] == '\n' or stash[i] == '\0'.
+- if stash[i] == '\n' -> length to copy is i + 1 (include the newline).
+  else -> length is i.
+- malloc line of (length + 1), copy that many chars, null-terminate.
+- return line.
+
+------------------------------------------------------------------------------
+static char *trim_stash(char **stash)  (a.k.a. "save the rest")
+------------------------------------------------------------------------------
+- Find the first '\n' in *stash.
+- If no '\n' (last line, no newline) -> free *stash, *stash = NULL, return NULL.
+- Otherwise the remainder starts at (newline index + 1).
+- define: char *rest = ft_substr(*stash, newline_index + 1, remaining_len);
+- free(*stash); *stash = rest;
+- return *stash.
+
+NOTES for gnl:
+- Put BUFFER_SIZE as a #define in the .c or header (e.g. 4096).
+- Add prototype to libft.h:  char *get_next_line(int fd);
+- Add both .c files to libft/Makefile SRCS.
+- helper funcs (ft_strjoin, ft_substr, ft_strchr, ft_strlen) already in libft.
+
+==============================================================================
+SECTION B - SHARED PARSER HELPERS (parse_utils.c)
+==============================================================================
+
+------------------------------------------------------------------------------
+void free_split(char **arr)
+------------------------------------------------------------------------------
+- if arr is NULL -> return.
+- define: int i = 0;
+- loop while arr[i] -> free(arr[i]); i++;
+- free(arr);
+
+------------------------------------------------------------------------------
+int is_empty_line(char *line)
+------------------------------------------------------------------------------
+- Returns 1 if the line is only whitespace (spaces/tabs/newline), else 0.
+- define: int i = 0;
+- loop while line[i]:
+    - if !ft_isspace(line[i]) -> return 0;
+    - i++;
+- return 1;
+
+------------------------------------------------------------------------------
+char *strip_newline(char *line)
+------------------------------------------------------------------------------
+- Removes a single trailing '\n' from a line in place (for identifier lines).
+- define: int len = ft_strlen(line);
+- if len > 0 and line[len - 1] == '\n' -> line[len - 1] = '\0';
+- return line;
+- NOTE: do NOT use this on map lines (spaces matter, but trailing \n must be
+  handled too - see parse_map, it strips only the '\n').
+
+------------------------------------------------------------------------------
+int count_words(char **split)
+------------------------------------------------------------------------------
+- define: int i = 0;
+- if split NULL -> return 0;
+- loop while split[i] -> i++;
+- return i;
+
+==============================================================================
+SECTION C - ENTRY POINT (parse_scene.c)
+==============================================================================
+
+------------------------------------------------------------------------------
+int parse_scene(t_game *game, char *path)
+------------------------------------------------------------------------------
+- define: int fd;  char *line;  int map_started = 0;  t_list *map_lines = NULL;
+- Step 1: if check_extension(path) fails -> return error_exit("bad extension").
+- Step 2: fd = open(path, O_RDONLY);
+    - if fd < 0 -> return error_exit("cannot open file").
+- Step 3: loop reading lines:
+    - line = get_next_line(fd);
+    - while (line != NULL):
+        - if handle_line(game, line, &map_started, &map_lines) fails:
+            -> free(line); close(fd); ft_lstclear(&map_lines, free);
+            -> return (1);   (handle_line already printed the error)
+        - free(line);
+        - line = get_next_line(fd);
+- Step 4: close(fd).
+- Step 5: if !all_config_set(game) -> ft_lstclear(&map_lines, free);
+          return error_exit("missing texture or color").
+- Step 6: if map_lines is NULL -> return error_exit("empty map").
+- Step 7: if build_map(game, map_lines) fails -> clear list, return 1.
+    (build_map converts the t_list into config.map char ** + width/height)
+- Step 8: ft_lstclear(&map_lines, free);   (list no longer needed)
+- Step 9: return validate_map(game);
+
+------------------------------------------------------------------------------
+int check_extension(char *path)
+------------------------------------------------------------------------------
+- define: int len = ft_strlen(path);
+- if len < 4 -> return 1 (error).
+- compare path + (len - 4) with ".cub" using ft_strcmp.
+- if not equal -> return 1;
+- return 0;
+
+------------------------------------------------------------------------------
+int handle_line(t_game *game, char *line, int *map_started, t_list **map_lines)
+------------------------------------------------------------------------------
+- This decides what each line is and routes it.
+- Step 1: if *map_started == 0:
+    - if is_empty_line(line) -> return 0;   (blank lines allowed before map)
+    - identify the leading token (skip leading spaces first):
+        - "NO"/"SO"/"WE"/"EA" -> return parse_textures(game, line);
+        - "F"/"C"             -> return parse_colors(game, line);
+        - otherwise -> this is the first map line:
+            - but first: if !all_config_set(game) ->
+                  return error_exit("map before all config set");
+            - set *map_started = 1;
+            - fall through to add it as a map line (Step 2).
+- Step 2: (*map_started == 1, we are in the map body):
+    - if is_empty_line(line) -> return error_exit("empty line inside map");
+      (map must be contiguous; an empty line here = error)
+    - add the line to the list:  ft_lstadd_back(map_lines,
+          ft_lstnew(ft_strdup(line)));
+    - if strdup/lstnew failed -> return error_exit("malloc failed").
+- return 0;
+
+------------------------------------------------------------------------------
+int all_config_set(t_game *game)
+------------------------------------------------------------------------------
+- Returns 1 only if all 6 elements are present.
+- check tex_path[NORTH], [SOUTH], [WEST], [EAST] are all non-NULL.
+- check floor_color and ceiling_color were set
+  (see note: use sentinel -1 as "not set" flag, set them to -1 in a small
+   init before parsing, or add two int flags to t_config like floor_set).
+- return 1 if all present, else 0.
+
+NOTE: add "int floor_set; int ceiling_set;" to t_config OR initialize
+      floor_color/ceiling_color to -1 in main/init and check against -1.
+
+==============================================================================
+SECTION D - TEXTURE PARSING (parse_textures.c)
+==============================================================================
+
+------------------------------------------------------------------------------
+int parse_textures(t_game *game, char *line)
+------------------------------------------------------------------------------
+- define: char **tokens;  int index;
+- Step 1: strip the trailing newline (strip_newline).
+- Step 2: tokens = ft_split(line, ' ');  (splits on spaces; also handle tabs
+          if you want - could ft_split on space then trim, keep it simple:
+          split on space, tabs are rare in the subject maps)
+- Step 3: if count_words(tokens) != 2 ->
+              free_split(tokens); return error_exit("bad texture line").
+    (must be exactly identifier + path)
+- Step 4: figure out which texture from tokens[0]:
+    - if ft_strcmp(tokens[0], "NO") == 0 -> index = NORTH;
+    - else if "SO" -> index = SOUTH;
+    - else if "WE" -> index = WEST;
+    - else if "EA" -> index = EAST;
+    - else -> free_split(tokens); return error_exit("unknown texture id").
+- Step 5: if game->config.tex_path[index] != NULL ->
+              free_split(tokens); return error_exit("duplicate texture").
+- Step 6: game->config.tex_path[index] = ft_strdup(tokens[1]);
+    - if strdup failed -> free_split(tokens); return error_exit("malloc").
+- Step 7: free_split(tokens);
+- Step 8: (optional) check the path ends in ".xpm".
+- return 0;
+
+==============================================================================
+SECTION E - COLOR PARSING (parse_colors.c)
+==============================================================================
+
+------------------------------------------------------------------------------
+int parse_colors(t_game *game, char *line)
+------------------------------------------------------------------------------
+- define: char **tokens;  int rgb;  int is_floor;
+- Step 1: strip_newline(line).
+- Step 2: tokens = ft_split(line, ' ');   (expect: [ "F"|"C", "R,G,B" ])
+- Step 3: if count_words(tokens) != 2 ->
+              free_split(tokens); return error_exit("bad color line").
+- Step 4: determine target:
+    - if ft_strcmp(tokens[0], "F") == 0 -> is_floor = 1;
+    - else if ft_strcmp(tokens[0], "C") == 0 -> is_floor = 0;
+    - else -> free_split(tokens); return error_exit("unknown color id").
+- Step 5: rgb = parse_rgb(tokens[1]);
+    - if rgb == -1 -> free_split(tokens); return error_exit("bad rgb").
+- Step 6: store + dupe check:
+    - if is_floor:
+        - if floor already set -> free_split; error_exit("dup floor").
+        - config.floor_color = rgb; mark floor_set = 1;
+    - else:
+        - if ceiling already set -> free_split; error_exit("dup ceiling").
+        - config.ceiling_color = rgb; mark ceiling_set = 1;
+- Step 7: free_split(tokens);
+- return 0;
+
+------------------------------------------------------------------------------
+int parse_rgb(char *str)
+------------------------------------------------------------------------------
+- Parses "R,G,B" -> packed int, or -1 on any error.
+- define: char **parts;  int i;  int vals[3];
+- Step 1: parts = ft_split(str, ',');
+- Step 2: if count_words(parts) != 3 -> free_split(parts); return -1;
+- Step 3: loop i from 0 to 2:
+    - if !is_valid_number(parts[i]) -> free_split(parts); return -1;
+    - vals[i] = ft_atoi(parts[i]);
+    - if vals[i] < 0 or vals[i] > 255 -> free_split(parts); return -1;
+- Step 4: free_split(parts).
+- Step 5: return (vals[0] << 16) | (vals[1] << 8) | vals[2];
+
+------------------------------------------------------------------------------
+int is_valid_number(char *str)
+------------------------------------------------------------------------------
+- Rejects empty strings and any non-digit char (allow no sign, no spaces).
+- if str is NULL or str[0] == '\0' -> return 0;
+- define: int i = 0;
+- loop while str[i]:
+    - if !ft_isdigit(str[i]) -> return 0;
+    - i++;
+- return 1;
+
+==============================================================================
+SECTION F - MAP BUILDING (parse_map.c)
+==============================================================================
+
+Note: parse_scene collected raw map lines into a t_list. build_map converts
+that list into config.map (char **), computes width/height, and pads rows so
+the grid is rectangular (makes validation MUCH easier).
+
+------------------------------------------------------------------------------
+int build_map(t_game *game, t_list *map_lines)
+------------------------------------------------------------------------------
+- define: int height;  int width;  int i;  t_list *cur;
+- Step 1: height = ft_lstsize(map_lines).
+- Step 2: game->config.map = malloc(sizeof(char *) * (height + 1));
+    - if NULL -> return error_exit("malloc map").
+- Step 3: width = get_max_width(map_lines).  (longest row, minus its '\n')
+- Step 4: cur = map_lines;  i = 0;
+    - while (cur):
+        - game->config.map[i] = pad_line(cur->content, width);
+        - if NULL -> (free already-filled rows) return error_exit("malloc").
+        - cur = cur->next;  i++;
+- Step 5: game->config.map[height] = NULL;
+- Step 6: game->config.map_height = height;
+- Step 7: game->config.map_width = width;
+- return 0;
+
+------------------------------------------------------------------------------
+int get_max_width(t_list *map_lines)
+------------------------------------------------------------------------------
+- define: int max = 0;  int len;  t_list *cur = map_lines;
+- while (cur):
+    - len = ft_strlen(cur->content);
+    - if the last char is '\n' -> len = len - 1;   (don't count newline)
+    - if len > max -> max = len;
+    - cur = cur->next;
+- return max;
+
+------------------------------------------------------------------------------
+char *pad_line(char *src, int width)
+------------------------------------------------------------------------------
+- Copies src into a new string of length `width`, replacing the trailing '\n'
+  and padding any short rows on the RIGHT with spaces.
+- define: char *dst;  int i;  int src_len = ft_strlen(src);
+- if src_len > 0 and src[src_len - 1] == '\n' -> src_len = src_len - 1;
+- dst = malloc(width + 1);  if NULL -> return NULL;
+- Step 1: copy: for i in 0..src_len-1 -> dst[i] = src[i];
+- Step 2: pad:  for i from src_len to width-1 -> dst[i] = ' ';
+- Step 3: dst[width] = '\0';
+- return dst;
+
+==============================================================================
+SECTION G - MAP VALIDATION (validate_map.c)
+==============================================================================
+
+------------------------------------------------------------------------------
+int validate_map(t_game *game)
+------------------------------------------------------------------------------
+- define: int player_count;
+- Step 1: if check_chars(game, &player_count) fails -> return 1;
+    (walks the whole grid, allows only 0 1 N S E W space, counts players,
+     records start pos + dir into config)
+- Step 2: if player_count != 1 -> return error_exit("need exactly 1 player").
+- Step 3: if check_closed(game) fails -> return 1;
+    (flood-fill closure test)
+- return 0;
+
+------------------------------------------------------------------------------
+int check_chars(t_game *game, int *player_count)
+------------------------------------------------------------------------------
+- define: int y;  int x;  char c;
+- *player_count = 0;
+- loop y over each row (0..map_height-1):
+    - loop x over each col (0..map_width-1):
+        - c = game->config.map[y][x];
+        - if c is one of '0','1',' ' -> continue;
+        - else if c is 'N','S','E','W':
+            - *player_count = *player_count + 1;
+            - config.start_x = x + 0.5;  (center of the tile)
+            - config.start_y = y + 0.5;
+            - config.start_dir = c;
+            - replace the cell with '0' in the map so flood-fill treats the
+              player tile as walkable floor:  game->config.map[y][x] = '0';
+        - else -> return error_exit("invalid char in map").
+- return 0;
+
+------------------------------------------------------------------------------
+int check_closed(t_game *game)
+------------------------------------------------------------------------------
+- Strategy: duplicate the map, flood-fill from the player start over floor.
+  If the fill ever steps out of bounds or onto a ' ' -> the map is open.
+- define: char **copy;  int leaked = 0;
+- Step 1: copy = dup_map(game->config.map, game->config.map_height);
+    - if NULL -> return error_exit("malloc").
+- Step 2: flood_fill(copy, (int)config.start_x, (int)config.start_y,
+                     game, &leaked);
+    - (pass width/height via game so the fill can bounds-check)
+- Step 3: free_split(copy).
+- Step 4: if leaked -> return error_exit("map is not closed").
+- return 0;
+
+------------------------------------------------------------------------------
+char **dup_map(char **map, int height)
+------------------------------------------------------------------------------
+- define: char **copy;  int i;
+- copy = malloc(sizeof(char *) * (height + 1));  if NULL -> return NULL.
+- loop i 0..height-1:
+    - copy[i] = ft_strdup(map[i]);
+    - if NULL -> free previous rows + copy, return NULL.
+- copy[height] = NULL;
+- return copy;
+
+------------------------------------------------------------------------------
+void flood_fill(char **map, int x, int y, t_game *game, int *leaked)
+------------------------------------------------------------------------------
+- Recursive 4-direction flood fill. Marks visited floor with 'F'.
+- Step 1: bounds check ->
+    - if x < 0 or y < 0 or y >= map_height or x >= map_width:
+        -> *leaked = 1; return;   (reached outside = open map)
+- Step 2: c = map[y][x];
+    - if c == ' ' -> *leaked = 1; return;   (reached void = open map)
+    - if c == '1' or c == 'F' -> return;    (wall or already visited)
+- Step 3: map[y][x] = 'F';   (mark visited)
+- Step 4: recurse into 4 neighbours:
+    - flood_fill(map, x + 1, y, game, leaked);
+    - flood_fill(map, x - 1, y, game, leaked);
+    - flood_fill(map, x, y + 1, game, leaked);
+    - flood_fill(map, x, y - 1, game, leaked);
+
+NOTE on width safety: because pad_line made every row exactly map_width long,
+map[y][x] is always valid for 0 <= x < map_width. Without padding you'd risk
+reading past a short row - that's why padding matters.
+
+==============================================================================
+SECTION H - WIRING IT UP / CHECKLIST
+==============================================================================
+[ ] Add get_next_line (+ utils) to libft, prototype, Makefile.
+[ ] Add free_split, is_empty_line, strip_newline, count_words to parser utils.
+[ ] Add "int floor_set; int ceiling_set;" to t_config (or init colors to -1).
+[ ] Add prototypes for every new function to includes/cub3d.h.
+[ ] Add src/parsing/parse_utils.c to the Makefile SRCS.
+[ ] Test each invalid map fixture returns an error + "Error\n" message.
+[ ] Run valgrind: no leaks on both success and every error path.
+
+==============================================================================
+FUNCTION INDEX (quick reference)
+==============================================================================
+GNL:        get_next_line, read_and_stash, extract_line, trim_stash
+UTILS:      free_split, is_empty_line, strip_newline, count_words
+ENTRY:      parse_scene, check_extension, handle_line, all_config_set
+TEXTURES:   parse_textures
+COLORS:     parse_colors, parse_rgb, is_valid_number
+MAP BUILD:  build_map, get_max_width, pad_line
+VALIDATE:   validate_map, check_chars, check_closed, dup_map, flood_fill
+==============================================================================

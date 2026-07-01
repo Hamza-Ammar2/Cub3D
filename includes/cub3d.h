@@ -17,6 +17,8 @@
 # define WIN_HEIGHT 720
 # define WIN_TITLE "cub3D"
 
+# define BUFFER_SIZE 4096
+
 # define MOVE_SPEED 0.05
 # define ROT_SPEED 0.03
 
@@ -146,5 +148,13 @@ int		update_player(t_game *game);
 int		error_exit(char *msg);
 void	free_game(t_game *game);
 void	put_pixel(t_img *img, int x, int y, int color);
+
+/* ************************************************************************** */
+/*                            GET_NEXT_LINE                                */
+/* ************************************************************************** */
+
+char	*get_next_line(int fd);
+char	*append(char *s1, char *s2, size_t l1, size_t l2);
+char	*find_char(char *s, char c, size_t len);
 
 #endif
