@@ -1,0 +1,2 @@
+# Drop your .xpm wall textures here: north.xpm, south.xpm, east.xpm, west.xpm
+# (miniLibX only loads the .xpm format out of the box.)

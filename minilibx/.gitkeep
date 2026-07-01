@@ -1,0 +1,2 @@
+# Place the miniLibX sources here (or use the system-installed version and
+# adjust MLX_FLAGS / INCLUDES in the root Makefile accordingly).
