@@ -1,5 +1,21 @@
 #include "cub3d.h"
 
+/* Free a NULL-terminated array of strings (e.g. ft_split output). */
+void	free_split(char **arr)
+{
+	int	i;
+
+	if (!arr)
+		return ;
+	i = 0;
+	while (arr[i])
+	{
+		free(arr[i]);
+		i++;
+	}
+	free(arr);
+}
+
 /* Free everything: map grid, texture paths, mlx images, window, display. */
 void	free_game(t_game *game)
 {

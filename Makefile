@@ -27,6 +27,7 @@ SRCS		= \
 	src/parsing/parse_colors.c \
 	src/parsing/parse_map.c \
 	src/parsing/validate_map.c \
+	src/parsing/parse_utils.c \
 	src/init/init_game.c \
 	src/raycasting/raycaster.c \
 	src/raycasting/render.c \

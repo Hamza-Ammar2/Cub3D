@@ -106,6 +106,22 @@ typedef struct s_game
 	t_keys		keys;
 }	t_game;
 
+/*
+** Transient state used ONLY while parsing the .cub file. It is created in
+** parse_scene(), threaded through the parsing helpers, and discarded once the
+** finished data has been committed to t_game.config. Keeps t_game clean of
+** fields that have no meaning after parsing is done.
+*/
+typedef struct s_parser
+{
+	t_game	*game;
+	int		fd;
+	int		line_no;
+	int		in_map;
+	int		seen;
+	t_list	*map_lines;
+}	t_parser;
+
 /* ************************************************************************** */
 /*                               PARSING                                    */
 /* ************************************************************************** */
@@ -115,6 +131,9 @@ int		parse_textures(t_game *game, char *line);
 int		parse_colors(t_game *game, char *line);
 int		parse_map(t_game *game, int fd);
 int		validate_map(t_game *game);
+int		is_empty_line(char *line);
+char	*strip_newline(char *line);
+int		count_words(char **split);
 
 /* ************************************************************************** */
 /*                                 INIT                                     */
@@ -147,6 +166,7 @@ int		update_player(t_game *game);
 
 int		error_exit(char *msg);
 void	free_game(t_game *game);
+void	free_split(char **arr);
 void	put_pixel(t_img *img, int x, int y, int color);
 
 /* ************************************************************************** */
