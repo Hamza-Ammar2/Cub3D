@@ -9,6 +9,14 @@
 # include <stdlib.h>
 # include <unistd.h>
 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 10
+# endif
+
+# define SIZE 64
+
+# define get_index(x) ((int)(x / SIZE))
+
 /* ************************************************************************** */
 /*                              CONFIG / MACROS                              */
 /* ************************************************************************** */
@@ -19,9 +27,11 @@
 
 # define MOVE_SPEED 0.05
 # define ROT_SPEED 0.03
+# define NUM_RAYS 50
 
 /* Field of view scaling for the camera plane (0.66 ~= 66 degrees FOV). */
 # define FOV_SCALE 0.66
+# define PI 3.14159265358979323846
 
 /* Keycodes (Linux / X11). Adjust if building on macOS. */
 # define KEY_ESC 65307
@@ -73,10 +83,9 @@ typedef struct s_config
 /* Player position, facing vector and camera plane. */
 typedef struct s_player
 {
-	double	pos_x;
-	double	pos_y;
-	double	dir_x;
-	double	dir_y;
+	int		x;
+	int		y;
+	double	angle;
 	double	plane_x;
 	double	plane_y;
 }	t_player;
@@ -103,6 +112,22 @@ typedef struct s_game
 	t_player	player;
 	t_keys		keys;
 }	t_game;
+
+
+typedef struct s_rect
+{
+	int	x;
+	int	y;
+	int	width;
+	int	height;
+}	t_rect;
+
+typedef struct s_vect
+{
+	int x;
+	int y;
+} t_vect;
+
 
 /* ************************************************************************** */
 /*                               PARSING                                    */
@@ -131,6 +156,20 @@ void	cast_rays(t_game *game);
 void	draw_column(t_game *game, int x);
 
 /* ************************************************************************** */
+/*                              DRAWING                                   */
+/* ************************************************************************** */
+
+
+void	draw_rect(t_game *game, t_rect rect, int color);
+void	draw_line(t_game *game, t_vect p0, t_vect p1, int color);
+void	put_pixel(t_img *img, int x, int y, int color);
+void	draw_map2D(t_game *game);
+void	draw_rays2D(t_player *player, t_game *game);
+void	get_map(char *file, t_game *game);
+t_vect	get_ray_end(t_game *game, double ray_angle);
+
+
+/* ************************************************************************** */
 /*                            PLAYER / EVENTS                               */
 /* ************************************************************************** */
 
@@ -145,6 +184,7 @@ int		update_player(t_game *game);
 
 int		error_exit(char *msg);
 void	free_game(t_game *game);
-void	put_pixel(t_img *img, int x, int y, int color);
-
+char	*get_next_line(int fd);
+char	*find_char(char *s, char c, size_t len);
+char	*append(char *s1, char *s2, size_t l1, size_t l2);
 #endif

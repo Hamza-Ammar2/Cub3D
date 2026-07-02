@@ -22,6 +22,7 @@ MLX_DIR		= minilibx
 # ---------------------------------------------------------------------------- #
 SRCS		= \
 	src/main.c \
+	src/getmap.c \
 	src/parsing/parse_scene.c \
 	src/parsing/parse_textures.c \
 	src/parsing/parse_colors.c \
@@ -33,6 +34,9 @@ SRCS		= \
 	src/player/movement.c \
 	src/events/hooks.c \
 	src/utils/errors.c \
+	src/raycasting/draw.c \
+	src/utils/get_next_line.c \
+	src/utils/get_next_line_utils.c \
 	src/utils/free.c
 
 OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
