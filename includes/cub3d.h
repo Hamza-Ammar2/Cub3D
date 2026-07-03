@@ -127,9 +127,14 @@ typedef struct s_parser
 /* ************************************************************************** */
 
 int		parse_scene(t_game *game, char *path);
+int		check_extension(char *path);
+int		handle_line(t_game *game, char *line, int *map_started,
+			t_list **map_lines);
+int		all_config_set(t_game *game);
 int		parse_textures(t_game *game, char *line);
 int		parse_colors(t_game *game, char *line);
 int		parse_map(t_game *game, int fd);
+int		build_map(t_game *game, t_list *map_lines);
 int		validate_map(t_game *game);
 int		is_empty_line(char *line);
 char	*strip_newline(char *line);
