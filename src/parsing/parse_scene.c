@@ -16,6 +16,21 @@ int	check_extension(char *path)
 	return (ft_strcmp(path + len - 4, ".cub") != 0);
 }
 
+/* True only when all 4 textures and both colors have been parsed. */
+int	all_config_set(t_game *game)
+{
+	int	i;
+
+	i = 0;
+	while (i < 4)
+	{
+		if (!game->config.tex_path[i])
+			return (0);
+		i++;
+	}
+	return (game->config.floor_set && game->config.ceiling_set);
+}
+
 /*
 ** Entry point for parsing the .cub file: check the extension, open the file,
 ** read + dispatch every line, then build and validate the map. Owns the fd and

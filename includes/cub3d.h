@@ -64,6 +64,8 @@ typedef struct s_config
 	char	*tex_path[4];
 	int		floor_color;
 	int		ceiling_color;
+	int		floor_set;
+	int		ceiling_set;
 	char	**map;
 	int		map_width;
 	int		map_height;
