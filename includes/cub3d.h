@@ -27,6 +27,9 @@
 # define WIN_TITLE "cub3D"
 
 # define MOVE_SPEED 0.02
+# define BUFFER_SIZE 4096
+
+# define MOVE_SPEED 0.05
 # define ROT_SPEED 0.03
 # define NUM_RAYS 50
 
@@ -81,6 +84,8 @@ typedef struct s_config
 	char	*tex_path[4];
 	int		floor_color;
 	int		ceiling_color;
+	int		floor_set;
+	int		ceiling_set;
 	char	**map;
 	int		map_width;
 	int		map_height;
@@ -127,7 +132,6 @@ typedef struct s_game
 	t_timing	timing;
 }	t_game;
 
-
 typedef struct s_rect
 {
 	int	x;
@@ -142,16 +146,43 @@ typedef struct s_vect
 	int y;
 } t_vect;
 
+/*
+** Transient state used ONLY while parsing the .cub file. It is created in
+** parse_scene(), threaded through the parsing helpers, and discarded once the
+** finished data has been committed to t_game.config. Keeps t_game clean of
+** fields that have no meaning after parsing is done.
+*/
+typedef struct s_parser
+{
+	t_game	*game;
+	int		fd;
+	int		line_no;
+	int		in_map;
+	int		seen;
+	t_list	*map_lines;
+}	t_parser;
 
 /* ************************************************************************** */
 /*                               PARSING                                    */
 /* ************************************************************************** */
 
 int		parse_scene(t_game *game, char *path);
+int		check_extension(char *path);
+int		handle_line(t_game *game, char *line, int *map_started,
+			t_list **map_lines);
+int		all_config_set(t_game *game);
 int		parse_textures(t_game *game, char *line);
 int		parse_colors(t_game *game, char *line);
+int		parse_color_fields(char **color_fields, int *is_floor);
+int		parse_rgb(char *str);
+int		store_color(t_game *game, int is_floor, int rgb);
+int		is_valid_number(char *str);
 int		parse_map(t_game *game, int fd);
+int		build_map(t_game *game, t_list *map_lines);
 int		validate_map(t_game *game);
+int		is_empty_line(char *line);
+char	*strip_newline(char *line);
+int		count_words(char **split);
 
 /* ************************************************************************** */
 /*                                 INIT                                     */
@@ -208,4 +239,14 @@ double  get_distance(t_vect start, t_vect end);
 int		game_loop(void *param);
 double	get_time_ms(void);
 void	clear_image(t_img *img);
+void	free_split(char **arr);
+void	put_pixel(t_img *img, int x, int y, int color);
+
+/* ************************************************************************** */
+/*                            GET_NEXT_LINE                                */
+/* ************************************************************************** */
+
+char	*get_next_line(int fd);
+char	*append(char *s1, char *s2, size_t l1, size_t l2);
+char	*find_char(char *s, char c, size_t len);
 #endif

@@ -26,8 +26,12 @@ SRCS		= \
 	src/parsing/parse_scene.c \
 	src/parsing/parse_textures.c \
 	src/parsing/parse_colors.c \
+	src/parsing/parse_colors_helpers.c \
+	src/parsing/parse_colors_rgb.c \
 	src/parsing/parse_map.c \
 	src/parsing/validate_map.c \
+	src/parsing/parse_utils.c \
+	src/parsing/handle_line.c \
 	src/init/init_game.c \
 	src/raycasting/raycaster.c \
 	src/raycasting/render.c \
@@ -42,6 +46,9 @@ SRCS		= \
 	src/utils/get_next_line.c \
 	src/utils/get_next_line_utils.c \
 	src/utils/free.c
+	src/utils/free.c \
+	src/utils/get_next_line.c \
+	src/utils/get_next_line_utils.c
 
 OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
@@ -49,8 +56,10 @@ OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 #   Libraries                                                                   #
 # ---------------------------------------------------------------------------- #
 LIBFT		= $(LIBFT_DIR)/libft.a
-# Linux (X11) linking. On macOS use: -L$(MLX_DIR) -lmlx -framework OpenGL -framework AppKit
-MLX_FLAGS	= -L$(MLX_DIR) -lmlx -lXext -lX11 -lm
+# Linux (X11) linking against a SYSTEM-installed MiniLibX (headers in
+# /usr/local/include, libmlx.a in /usr/local/lib). The local minilibx/mlx.h
+# wrapper uses #include_next to reach the system header.
+MLX_FLAGS	= -L/usr/local/lib -lmlx -lXext -lX11 -lm
 INCLUDES	= -I$(INC_DIR) -I$(LIBFT_DIR) -I$(MLX_DIR)
 
 # ---------------------------------------------------------------------------- #
