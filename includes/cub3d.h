@@ -8,6 +8,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <sys/time.h>
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 10
@@ -25,7 +26,7 @@
 # define WIN_HEIGHT 720
 # define WIN_TITLE "cub3D"
 
-# define MOVE_SPEED 0.05
+# define MOVE_SPEED 0.02
 # define ROT_SPEED 0.03
 # define NUM_RAYS 50
 
@@ -41,6 +42,8 @@
 # define KEY_D 100
 # define KEY_LEFT 65361
 # define KEY_RIGHT 65363
+# define KEY_PRESS 2
+# define KEY_RELEASE 3
 
 /* Cardinal directions, used to index the wall texture array. */
 enum e_dir
@@ -54,6 +57,12 @@ enum e_dir
 /* ************************************************************************** */
 /*                                 STRUCTS                                  */
 /* ************************************************************************** */
+
+typedef struct s_timing
+{
+	double	last_frame;
+	double			target_fps;
+}	t_timing;
 
 typedef struct s_img
 {
@@ -83,11 +92,15 @@ typedef struct s_config
 /* Player position, facing vector and camera plane. */
 typedef struct s_player
 {
-	int		x;
-	int		y;
+	double		x;
+	double		y;
 	double	angle;
-	double	plane_x;
-	double	plane_y;
+	int		move_forward;
+	int		move_backward;
+	int		move_left;
+	int		move_right;
+	int		rotate_left;
+	int		rotate_right;
 }	t_player;
 
 /* Per-key held state for smooth movement. */
@@ -111,6 +124,7 @@ typedef struct s_game
 	t_config	config;
 	t_player	player;
 	t_keys		keys;
+	t_timing	timing;
 }	t_game;
 
 
@@ -153,7 +167,8 @@ int		load_textures(t_game *game);
 
 int		render_frame(t_game *game);
 void	cast_rays(t_game *game);
-void	draw_column(t_game *game, int x);
+void	draw_column(t_game *game, int x, int lineH);
+t_vect get_end(t_game *game, double ray_angle);
 
 /* ************************************************************************** */
 /*                              DRAWING                                   */
@@ -187,4 +202,10 @@ void	free_game(t_game *game);
 char	*get_next_line(int fd);
 char	*find_char(char *s, char c, size_t len);
 char	*append(char *s1, char *s2, size_t l1, size_t l2);
+int		key_it(int key, t_game *game);
+int		handle_rotation(int key, t_game *game);
+double  get_distance(t_vect start, t_vect end);
+int		game_loop(void *param);
+double	get_time_ms(void);
+void	clear_image(t_img *img);
 #endif

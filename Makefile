@@ -34,6 +34,10 @@ SRCS		= \
 	src/player/movement.c \
 	src/events/hooks.c \
 	src/utils/errors.c \
+	src/utils/vect_utils.c \
+	src/utils/game_loop.c \
+	src/raycasting/cast2D.c \
+	src/utils/handle_keys.c \
 	src/raycasting/draw.c \
 	src/utils/get_next_line.c \
 	src/utils/get_next_line_utils.c \

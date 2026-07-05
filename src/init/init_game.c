@@ -18,10 +18,10 @@ int	init_game(t_game *game)
 		return (error_exit("image data init failed"));
 	game->frame.width = WIN_WIDTH;
 	game->frame.height = WIN_HEIGHT;
-	mlx_hook(game->win, 2, 1L << 0, handle_keypress, game);
-	mlx_hook(game->win, 3, 1L << 1, handle_keyrelease, game);
+	//mlx_hook(game->win, 2, 1L << 0, handle_keypress, game);
+	//mlx_hook(game->win, 3, 1L << 1, handle_keyrelease, game);
 	mlx_hook(game->win, 17, 1L << 17, handle_close, game);
-	mlx_loop_hook(game->mlx, render_frame, game);
+	//mlx_loop_hook(game->mlx, render_frame, game);
 	return (0);
 }
 

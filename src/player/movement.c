@@ -5,63 +5,36 @@
 ** wall collision checks), left/right arrows rotate dir + camera plane.
 */
 
-t_vect	get_ray_end(t_game *game, double ray_angle)
-{
-	t_player *player = &game->player;
-	double x = player->x;
-	double y = player->y;
-
-	double m = tan(ray_angle);
-	double dx = SIZE;
-	double dy = m * dx;
-
-	x = get_index(player->x) * SIZE + SIZE;
-	y = player->y + m * (x - player->x);
-	if (cos(ray_angle) < 0)
-	{
-		dx = -SIZE;
-		dy = m * dx;
-		x = get_index(player->x) * SIZE;
-	}
-	while (1)
-	{
-		int i = get_index(y);
-		int j = get_index(x);
-
-		if (i < 0 || i >= game->config.map_height)
-			break;
-		if (j < 0 || j >= game->config.map_width)
-			break;
-
-		if (game->config.map[i][j] == '1')
-			break;
-		x += dx;
-		y += dy;
-	}
-	return (t_vect){.x = (int)x, .y = (int)y};
-}
-
-void	draw_rays2D(t_player *player, t_game *game)
-{
-	double ray_angle;
-	t_vect ray_end;
-	int i;
-
-	ray_angle = player->angle - (FOV_SCALE / 2);
-	i = 0;
-	while (i < NUM_RAYS)
-	{
-		ray_end = get_ray_end(game, ray_angle);
-		draw_line(game, (t_vect){.x = player->x, .y = player->y}, ray_end, 0xFF0000);
-		ray_angle += FOV_SCALE / NUM_RAYS;
-		i++;
-	}
-}
-
 
 
 int	update_player(t_game *game)
 {
-	(void)game;
-	return (0);
+	t_player *player = &game->player;
+	double speed = MOVE_SPEED * SIZE;
+
+	if (player->move_forward)
+	{
+		player->x += cos(player->angle) * speed;
+		player->y += sin(player->angle) * speed;
+	}
+	if (player->move_backward)
+	{
+		player->x -= cos(player->angle) * speed;
+		player->y -= sin(player->angle) * speed;
+	}
+	if (player->move_left)
+	{
+		player->x -= cos(player->angle + PI / 2) * speed;
+		player->y -= sin(player->angle + PI / 2) * speed;
+	}
+	if (player->move_right)
+	{
+		player->x += cos(player->angle + PI / 2) * speed;
+		player->y += sin(player->angle + PI / 2) * speed;
+	}
+	if (player->rotate_left)
+		player->angle -= ROT_SPEED;
+	if (player->rotate_right)
+		player->angle += ROT_SPEED;
+	return (1);
 }
