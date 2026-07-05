@@ -45,7 +45,7 @@ SRCS		= \
 	src/raycasting/draw.c \
 	src/utils/get_next_line.c \
 	src/utils/get_next_line_utils.c \
-	src/utils/free.c
+	src/utils/free.c \
 	src/utils/free.c \
 	src/utils/get_next_line.c \
 	src/utils/get_next_line_utils.c
