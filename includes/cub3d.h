@@ -27,9 +27,6 @@
 # define WIN_TITLE "cub3D"
 
 # define MOVE_SPEED 0.02
-# define BUFFER_SIZE 4096
-
-# define MOVE_SPEED 0.05
 # define ROT_SPEED 0.03
 # define NUM_RAYS 50
 
