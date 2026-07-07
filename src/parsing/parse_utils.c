@@ -38,3 +38,20 @@ int	count_words(char **split)
 		i++;
 	return (i);
 }
+
+/* Return 1 if str is a non-empty run of digits only, else 0. */
+int	is_valid_number(char *str)
+{
+	int	i;
+
+	if (!str || str[0] == '\0')
+		return (0);
+	i = 0;
+	while (str[i])
+	{
+		if (!ft_isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
