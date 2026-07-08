@@ -50,12 +50,12 @@ static int	check_cell(t_game *game, int x, int y, int *pc)
 	char	c;
 
 	c = game->config.map[y][x];
-	if (c == 'N' || c == 'S' || c == 'E' || c == 'W')
+	if (ft_strchr("NSEW", c))
 	{
 		(*pc)++;
 		set_player(game, x, y);
 	}
-	else if (c != '0' && c != '1' && c != ' ')
+	else if (!ft_strchr("01 ", c))
 		return (error_exit("invalid char in map"));
 	return (0);
 }

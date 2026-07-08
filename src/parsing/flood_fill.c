@@ -1,30 +1,36 @@
 #include "cub3d.h"
 
 static char	**dup_map(char **map, int height);
-static void	flood_fill(t_flood *f, int x, int y);
+static int	touches_void(char **map, int width, int height, int x, int y);
 
-/*
-** Closure test: flood fill a throwaway copy of the grid from the player start.
-** If the fill ever reaches a space or the grid edge, the map is not sealed.
-*/
+/* Closure test: every walkable tile must be surrounded by non-void tiles. */
 int	check_closed(t_game *game)
 {
-	t_flood	f;
+	char	**copy;
+	int		x;
+	int		y;
 
-	f.map = dup_map(game->config.map, game->config.map_height);
-	if (!f.map)
+	copy = dup_map(game->config.map, game->config.map_height);
+	if (!copy)
 		return (error_exit("malloc"));
-	f.width = game->config.map_width;
-	f.height = game->config.map_height;
-	f.leaked = 0;
-	flood_fill(&f, (int)game->config.start_x, (int)game->config.start_y);
-	free_split(f.map);
-	if (f.leaked)
-		return (error_exit("map is not closed"));
+	y = 0;
+	while (y < game->config.map_height)
+	{
+		x = 0;
+		while (x < game->config.map_width)
+		{
+			if (copy[y][x] == '0' && touches_void(copy, game->config.map_width,
+					game->config.map_height, x, y))
+				return (free_split(copy), error_exit("map is not closed"));
+			x++;
+		}
+		y++;
+	}
+	free_split(copy);
 	return (0);
 }
 
-/* Duplicate the grid so the fill can mutate it without touching config.map. */
+/* Duplicate the grid so closure checks can run without touching config.map. */
 static char	**dup_map(char **map, int height)
 {
 	char	**copy;
@@ -34,42 +40,27 @@ static char	**dup_map(char **map, int height)
 	if (!copy)
 		return (NULL);
 	i = 0;
+	while (i <= height)
+		copy[i++] = NULL;
+	i = 0;
 	while (i < height)
 	{
 		copy[i] = ft_strdup(map[i]);
 		if (!copy[i])
-		{
-			while (i-- > 0)
-				free(copy[i]);
-			return (free(copy), NULL);
-		}
+			return (free_split(copy), NULL);
 		i++;
 	}
-	copy[height] = NULL;
 	return (copy);
 }
 
-/* Recursive 4-way fill; marks visited floor 'F', flags leaks to void/edge. */
-static void	flood_fill(t_flood *f, int x, int y)
+/* True when a walkable tile touches map edge or void space in 4-neighbours. */
+static int	touches_void(char **map, int width, int height, int x, int y)
 {
-	char	c;
-
-	if (x < 0 || y < 0 || y >= f->height || x >= f->width)
-	{
-		f->leaked = 1;
-		return ;
-	}
-	c = f->map[y][x];
-	if (c == ' ')
-	{
-		f->leaked = 1;
-		return ;
-	}
-	if (c == '1' || c == 'F')
-		return ;
-	f->map[y][x] = 'F';
-	flood_fill(f, x + 1, y);
-	flood_fill(f, x - 1, y);
-	flood_fill(f, x, y + 1);
-	flood_fill(f, x, y - 1);
+	if (x == 0 || y == 0 || x == width - 1 || y == height - 1)
+		return (1);
+	if (map[y][x + 1] == ' ' || map[y][x - 1] == ' ')
+		return (1);
+	if (map[y + 1][x] == ' ' || map[y - 1][x] == ' ')
+		return (1);
+	return (0);
 }

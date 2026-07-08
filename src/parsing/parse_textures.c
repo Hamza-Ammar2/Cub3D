@@ -1,25 +1,29 @@
 #include "cub3d.h"
 
-static int	get_texture_index(char *id)
+static int	texture_index_from_id(const char *id)
 {
-	if (ft_strcmp(id, "NO") == 0)
-		return (NORTH);
-	if (ft_strcmp(id, "SO") == 0)
-		return (SOUTH);
-	if (ft_strcmp(id, "WE") == 0)
-		return (WEST);
-	if (ft_strcmp(id, "EA") == 0)
-		return (EAST);
+	static const char	*keys[] = {"NO", "SO", "WE", "EA"};
+	int					i;
+
+	i = 0;
+	while (i < 4)
+	{
+		if (ft_strcmp(id, keys[i]) == 0)
+			return (i);
+		i++;
+	}
 	return (-1);
 }
 
-static int	assign_texture_path(t_game *game, char **texture_fields)
+static int	set_texture_path(t_game *game, char **texture_fields)
 {
 	int	i;
 
-	i = get_texture_index(texture_fields[0]);
+	i = texture_index_from_id(texture_fields[0]);
 	if (i < 0)
 		return (error_exit("unknown texture id"));
+	if (game->config.tex_path[i])
+		return (error_exit("duplicate texture"));
 	game->config.tex_path[i] = ft_strdup(texture_fields[1]);
 	if (!game->config.tex_path[i])
 		return (error_exit("malloc failed"));
@@ -39,7 +43,7 @@ int	parse_textures(t_game *game, char *line)
 		free_split(texture_fields);
 		return (error_exit("bad texture line"));
 	}
-	result = assign_texture_path(game, texture_fields);
+	result = set_texture_path(game, texture_fields);
 	free_split(texture_fields);
 	return (result);
 }

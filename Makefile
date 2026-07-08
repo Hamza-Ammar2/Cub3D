@@ -68,6 +68,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
+	$(MAKE) -C $(LIBFT_DIR) bonus
 
 bonus: all
 
