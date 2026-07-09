@@ -40,7 +40,7 @@ AR       = ar rcs
 # Default build
 all: $(NAME)
 
-$(NAME): $(OBJFILES)
+$(NAME): $(OBJFILES) $(BONUS_FILES)
 	@echo "$(YELLOW)Archiving $(BLUE)$@$(YELLOW)…$(RESET)"
 	@$(AR) $@ $^
 	@echo "$(GREEN)Built library: $(BLUE)$@$(RESET)"

@@ -173,6 +173,10 @@ int		parse_color_fields(char **color_fields, int *is_floor);
 int		parse_rgb(char *str);
 int		store_color(t_game *game, int is_floor, int rgb);
 int		is_valid_number(char *str);
+<<<<<<< HEAD
+=======
+int		parse_map(t_game *game, int fd);
+>>>>>>> main
 int		build_map(t_game *game, t_list *map_lines);
 int		validate_map(t_game *game);
 int		check_closed(t_game *game);
