@@ -42,11 +42,7 @@ int	count_words(char **split)
 	return (i);
 }
 
-<<<<<<< HEAD
 /* Return 1 if str is a non-empty run of digits only, else 0. */
-=======
-/* Return 1 if the string contains only digits, else 0. */
->>>>>>> main
 int	is_valid_number(char *str)
 {
 	int	i;
