@@ -25,6 +25,7 @@ static int	add_map_line(t_list **map_lines, char *line)
 	dup = ft_strdup(line);
 	if (!dup)
 		return (error_exit("malloc failed"));
+	strip_newline(dup);
 	node = ft_lstnew(dup);
 	if (!node)
 		return (free(dup), error_exit("malloc failed"));

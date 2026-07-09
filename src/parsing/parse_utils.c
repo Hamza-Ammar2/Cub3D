@@ -21,8 +21,11 @@ char	*strip_newline(char *line)
 	int	length;
 
 	length = ft_strlen(line);
-	if (length > 0 && line[length - 1] == '\n')
+	while (length > 0 && (line[length - 1] == '\n' || line[length - 1] == '\r'))
+	{
 		line[length - 1] = '\0';
+		length--;
+	}
 	return (line);
 }
 
