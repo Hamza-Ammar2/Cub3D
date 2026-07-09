@@ -41,7 +41,7 @@ t_vect	get_ray_end_horizontal(t_game *game, double ray_angle)
 		x += dx;
 		y += dy;
 	}
-	return (t_vect){.x = (int)x, .y = (int)y};
+	return (t_vect){.x = x, .y = y};
 }
 
 t_vect	get_ray_end(t_game *game, double ray_angle)
@@ -83,7 +83,7 @@ t_vect	get_ray_end(t_game *game, double ray_angle)
 		x += dx;
 		y += dy;
 	}
-	return (t_vect){.x = (int)x, .y = (int)y};
+	return (t_vect){.x = x, .y = y};
 }
 
 t_vect get_end(t_game *game, double ray_angle)

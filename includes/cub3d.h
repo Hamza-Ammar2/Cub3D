@@ -98,6 +98,7 @@ typedef struct s_config
 	double	start_x;
 	double	start_y;
 	char	start_dir;
+	int		cur_side;
 }	t_config;
 
 /* Player position and facing angle (pixel coords for movement/raycast). */

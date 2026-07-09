@@ -8,39 +8,44 @@
 
 static int	get_wall_side(t_game *game, t_vect end, double ray_angle)
 {
-	t_player	*player = &game->player;
-	// int			map_x = get_index(end.x);
-	// int			map_y = get_index(end.y);
-	int			side;
+	double	eps;
 
-	// if (map_x < 0 || map_x >= game->config.map_width
-	// 	|| map_y < 0 || map_y >= game->config.map_height)
-	// 	return (-1);
-	// if (game->config.map[map_y][map_x] != '1')
-	// 	return (-1);
-	if (fabs(end.x - player->x) > fabs(end.y - player->y))
-		side = (ray_angle > PI / 2 && ray_angle < 3 * PI / 2) ? WEST : EAST;
+	eps = 0.0001;
+	(game->config.cur_side) = -1;
+	if (fmod(end.x, SIZE) < eps)
+	{
+		printf("fmod(end.y, SIZE) = %f\n", fmod(end.y, SIZE));
+		if (cos(ray_angle) > 0)
+			return (EAST);
+		else
+			return (WEST);
+	}
 	else
-		side = (ray_angle < PI) ? NORTH : SOUTH;
-	return (side);
+	{
+		if (sin(ray_angle) > 0)
+			return (SOUTH);
+		else
+			return (NORTH);
+	}
 }
 
 static t_rect	getuv_rect(t_game *game, t_vect end, double ray_angle)
 {
 	t_rect	uv;
-	//int		side;
-	// float d;
-	// float n;
+	int		side;
 
-	// d = WIN_WIDTH / (float)NUM_RAYS;
-	// n = SIZE / d;
-	uv.width = game->textures[3].width;
-	uv.height = game->textures[3].height;
-	get_wall_side(game, end, ray_angle);
-	// (side);
-
-	uv.x = (int) (fmod(end.x, SIZE) * game->textures[3].width / SIZE);
+	side = get_wall_side(game, end, ray_angle);
+	uv.width = 1;
+	uv.height = game->textures[side].height;
+	uv.x = (int) (fmod(end.x, SIZE) * game->textures[side].width / SIZE);
+	if (side == SOUTH)
+		uv.x = game->textures[side].width - uv.x - 1;
+	else if (side == EAST || side == WEST)
+		uv.x = (int) (fmod(end.y, SIZE) * game->textures[side].width / SIZE);
+	if (side == WEST)
+		uv.x = game->textures[side].width - uv.x - 1;
 	uv.y = 0;
+	game->config.cur_side = side;
 	return (uv);
 }
 
@@ -72,11 +77,12 @@ void	draw_column(t_game *game, t_rect uv, int x, int line_h)
 {
 	int		start_y;
 	t_rect	rect;
-	//int		side = get_wall_side(game, (t_vect){.x = game->player.x + cos(game->player.angle) * 1000, .y = game->player.y + sin(game->player.angle) * 1000}, game->player.angle);
 
 	start_y = (WIN_HEIGHT - line_h) / 2;
 	rect = (t_rect){x, start_y, WIN_WIDTH / NUM_RAYS, line_h};
-	//draw_rect(game, rect, 0xFFFFFF);
-	//uv.x = x % game->textures[3].width; // Keep src_x locked to the ray's sample point instead of stretching it
-	draw_img(&game->frame, &game->textures[3], uv, rect);
+	draw_img(&game->frame, &game->textures[game->config.cur_side], uv, rect);
+	if (start_y > 0)
+		draw_rect(game, (t_rect){x, 0, WIN_WIDTH / NUM_RAYS, start_y}, game->config.ceiling_color);
+	if (start_y + line_h < WIN_HEIGHT)
+		draw_rect(game, (t_rect){x, start_y + line_h, WIN_WIDTH / NUM_RAYS, WIN_HEIGHT - (start_y + line_h)}, game->config.floor_color);
 }
