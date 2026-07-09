@@ -14,7 +14,6 @@ static int	get_wall_side(t_game *game, t_vect end, double ray_angle)
 	(game->config.cur_side) = -1;
 	if (fmod(end.x, SIZE) < eps)
 	{
-		printf("fmod(end.y, SIZE) = %f\n", fmod(end.y, SIZE));
 		if (cos(ray_angle) > 0)
 			return (EAST);
 		else
