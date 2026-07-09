@@ -29,12 +29,12 @@ static t_rect	getuv_rect(t_game *game, t_vect end, double ray_angle)
 {
 	t_rect	uv;
 	//int		side;
-	float d;
-	float n;
+	// float d;
+	// float n;
 
-	d = WIN_WIDTH / (float)NUM_RAYS;
-	n = SIZE / d;
-	uv.width = (int) game->textures[3].width / n;
+	// d = WIN_WIDTH / (float)NUM_RAYS;
+	// n = SIZE / d;
+	uv.width = game->textures[3].width;
 	uv.height = game->textures[3].height;
 	get_wall_side(game, end, ray_angle);
 	// (side);
@@ -77,6 +77,6 @@ void	draw_column(t_game *game, t_rect uv, int x, int line_h)
 	start_y = (WIN_HEIGHT - line_h) / 2;
 	rect = (t_rect){x, start_y, WIN_WIDTH / NUM_RAYS, line_h};
 	//draw_rect(game, rect, 0xFFFFFF);
-	uv.x = x % game->textures[3].width; // Keep src_x locked to the ray's sample point instead of stretching it
+	//uv.x = x % game->textures[3].width; // Keep src_x locked to the ray's sample point instead of stretching it
 	draw_img(&game->frame, &game->textures[3], uv, rect);
 }
