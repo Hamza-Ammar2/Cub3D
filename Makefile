@@ -15,7 +15,7 @@ SRC_DIR		= src
 OBJ_DIR		= obj
 INC_DIR		= includes
 LIBFT_DIR	= libft
-MLX_DIR		= minilibx
+MLX_DIR		= minilibx-linux
 
 # ---------------------------------------------------------------------------- #
 #   Sources                                                                     #
@@ -45,7 +45,8 @@ SRCS		= \
 	src/utils/vect_utils.c \
 	src/utils/free.c \
 	src/utils/get_next_line.c \
-	src/utils/get_next_line_utils.c
+	src/utils/get_next_line_utils.c \
+	src/utils/img_utils.c
 
 OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
@@ -56,7 +57,8 @@ LIBFT		= $(LIBFT_DIR)/libft.a
 # Linux (X11) linking against a SYSTEM-installed MiniLibX (headers in
 # /usr/local/include, libmlx.a in /usr/local/lib). The local minilibx/mlx.h
 # wrapper uses #include_next to reach the system header.
-MLX_FLAGS	= -L/usr/local/lib -lmlx -lXext -lX11 -lm
+#MLX_FLAGS	= -L/usr/local/lib -lmlx -lXext -lX11 -lm
+MLX_FLAGS	= -L$(MLX_DIR) -lmlx -lXext -lX11 -lm -lz
 INCLUDES	= -I$(INC_DIR) -I$(LIBFT_DIR) -I$(MLX_DIR)
 
 # ---------------------------------------------------------------------------- #

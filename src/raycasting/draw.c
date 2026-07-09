@@ -49,8 +49,8 @@ void	draw_line(t_game *game, t_vect p0, t_vect p1, int color)
 	int	err;
 	int	e2;
 
-	dx = abs(p1.x - p0.x);
-	dy = abs(p1.y - p0.y);
+	dx = fabs(p1.x - p0.x);
+	dy = fabs(p1.y - p0.y);
 	if (p0.x < p1.x)
 		sx = 1;
 	else

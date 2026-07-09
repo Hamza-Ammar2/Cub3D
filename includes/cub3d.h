@@ -2,7 +2,7 @@
 # define CUB3D_H
 
 # include "../libft/libft.h"
-# include <mlx.h>
+# include <../minilibx-linux/mlx.h>
 # include <math.h>
 # include <fcntl.h>
 # include <stdio.h>
@@ -25,7 +25,7 @@
 
 # define MOVE_SPEED 0.02
 # define ROT_SPEED 0.03
-# define NUM_RAYS 50
+# define NUM_RAYS WIN_WIDTH
 
 /* Field of view scaling for the camera plane (0.66 ~= 66 degrees FOV). */
 # define FOV_SCALE 0.66
@@ -80,8 +80,8 @@ typedef struct s_rect
 
 typedef struct s_vect
 {
-	int	x;
-	int	y;
+	double	x;
+	double	y;
 }	t_vect;
 
 /* Parsed scene configuration coming from the .cub file. */
@@ -193,8 +193,9 @@ int		load_textures(t_game *game);
 
 int		render_frame(t_game *game);
 void	cast_rays(t_game *game);
-void	draw_column(t_game *game, int x, int line_h);
+void	draw_column(t_game *game, t_rect uv, int x, int line_h);
 t_vect	get_end(t_game *game, double ray_angle);
+void	draw_img(t_img *frame, t_img *src, t_rect src_rect, t_rect dst);
 
 /* ************************************************************************** */
 /*                              DRAWING                                     */
@@ -228,6 +229,7 @@ double	get_distance(t_vect start, t_vect end);
 int		game_loop(void *param);
 double	get_time_ms(void);
 void	clear_image(t_img *img);
+int		load_image(t_game *game, t_img *img, char *path);
 
 /* ************************************************************************** */
 /*                            GET_NEXT_LINE                                */
