@@ -1,6 +1,19 @@
 #include "cub3d.h"
 
-/* Boot mlx, create the window + frame image, load textures, place player. */
+static double	start_angle(char dir)
+{
+	if (dir == 'E')
+		return (0.0);
+	if (dir == 'S')
+		return (PI / 2.0);
+	if (dir == 'W')
+		return (PI);
+	if (dir == 'N')
+		return (3.0 * PI / 2.0);
+	return (0.0);
+}
+
+/* Boot mlx, create the window + frame image, wire input hooks. */
 int	init_game(t_game *game)
 {
 	game->mlx = mlx_init();
@@ -21,13 +34,15 @@ int	init_game(t_game *game)
 	mlx_hook(game->win, 2, 1L << 0, handle_keypress, game);
 	mlx_hook(game->win, 3, 1L << 1, handle_keyrelease, game);
 	mlx_hook(game->win, 17, 1L << 17, handle_close, game);
-	mlx_loop_hook(game->mlx, render_frame, game);
 	return (0);
 }
 
+/* Place player from parsed spawn (tile coords -> pixel coords). */
 int	init_player(t_game *game)
 {
-	(void)game;
+	game->player.x = game->config.start_x * SIZE;
+	game->player.y = game->config.start_y * SIZE;
+	game->player.angle = start_angle(game->config.start_dir);
 	return (0);
 }
 

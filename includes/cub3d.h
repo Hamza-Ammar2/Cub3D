@@ -8,6 +8,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <sys/time.h>
 
 /* ************************************************************************** */
 /*                              CONFIG / MACROS                              */
@@ -19,11 +20,16 @@
 
 # define BUFFER_SIZE 4096
 
-# define MOVE_SPEED 0.05
+# define SIZE 64
+# define get_index(x) ((int)(x / SIZE))
+
+# define MOVE_SPEED 0.02
 # define ROT_SPEED 0.03
+# define NUM_RAYS 50
 
 /* Field of view scaling for the camera plane (0.66 ~= 66 degrees FOV). */
 # define FOV_SCALE 0.66
+# define PI 3.14159265358979323846
 
 /* Keycodes (Linux / X11). Adjust if building on macOS. */
 # define KEY_ESC 65307
@@ -47,6 +53,12 @@ enum e_dir
 /*                                 STRUCTS                                  */
 /* ************************************************************************** */
 
+typedef struct s_timing
+{
+	double	last_frame;
+	double	target_fps;
+}	t_timing;
+
 typedef struct s_img
 {
 	void	*ptr;
@@ -57,6 +69,20 @@ typedef struct s_img
 	int		width;
 	int		height;
 }	t_img;
+
+typedef struct s_rect
+{
+	int	x;
+	int	y;
+	int	width;
+	int	height;
+}	t_rect;
+
+typedef struct s_vect
+{
+	int	x;
+	int	y;
+}	t_vect;
 
 /* Parsed scene configuration coming from the .cub file. */
 typedef struct s_config
@@ -74,15 +100,12 @@ typedef struct s_config
 	char	start_dir;
 }	t_config;
 
-/* Player position, facing vector and camera plane. */
+/* Player position and facing angle (pixel coords for movement/raycast). */
 typedef struct s_player
 {
-	double	pos_x;
-	double	pos_y;
-	double	dir_x;
-	double	dir_y;
-	double	plane_x;
-	double	plane_y;
+	double	x;
+	double	y;
+	double	angle;
 }	t_player;
 
 /* Per-key held state for smooth movement. */
@@ -106,6 +129,7 @@ typedef struct s_game
 	t_config	config;
 	t_player	player;
 	t_keys		keys;
+	t_timing	timing;
 }	t_game;
 
 /*
@@ -169,7 +193,17 @@ int		load_textures(t_game *game);
 
 int		render_frame(t_game *game);
 void	cast_rays(t_game *game);
-void	draw_column(t_game *game, int x);
+void	draw_column(t_game *game, int x, int line_h);
+t_vect	get_end(t_game *game, double ray_angle);
+
+/* ************************************************************************** */
+/*                              DRAWING                                     */
+/* ************************************************************************** */
+
+void	draw_rect(t_game *game, t_rect rect, int color);
+void	draw_line(t_game *game, t_vect p0, t_vect p1, int color);
+void	draw_map2d(t_game *game);
+void	draw_rays2d(t_player *player, t_game *game);
 
 /* ************************************************************************** */
 /*                            PLAYER / EVENTS                               */
@@ -179,6 +213,8 @@ int		handle_keypress(int key, t_game *game);
 int		handle_keyrelease(int key, t_game *game);
 int		handle_close(t_game *game);
 int		update_player(t_game *game);
+int		key_it(int key, t_game *game);
+int		handle_rotation(int key, t_game *game);
 
 /* ************************************************************************** */
 /*                                UTILS                                     */
@@ -188,6 +224,10 @@ int		error_exit(char *msg);
 void	free_game(t_game *game);
 void	free_split(char **arr);
 void	put_pixel(t_img *img, int x, int y, int color);
+double	get_distance(t_vect start, t_vect end);
+int		game_loop(void *param);
+double	get_time_ms(void);
+void	clear_image(t_img *img);
 
 /* ************************************************************************** */
 /*                            GET_NEXT_LINE                                */

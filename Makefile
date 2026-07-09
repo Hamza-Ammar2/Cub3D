@@ -34,10 +34,15 @@ SRCS		= \
 	src/parsing/handle_line.c \
 	src/init/init_game.c \
 	src/raycasting/raycaster.c \
+	src/raycasting/cast2D.c \
+	src/raycasting/draw.c \
 	src/raycasting/render.c \
 	src/player/movement.c \
 	src/events/hooks.c \
 	src/utils/errors.c \
+	src/utils/game_loop.c \
+	src/utils/handle_keys.c \
+	src/utils/vect_utils.c \
 	src/utils/free.c \
 	src/utils/get_next_line.c \
 	src/utils/get_next_line_utils.c
