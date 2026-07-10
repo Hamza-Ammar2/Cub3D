@@ -1,16 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   movement.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
-/*
-** Apply held-key state each frame: WASD translate the position vector,
-** left/right arrows rotate the facing angle.
-*/
-int	update_player(t_game *game)
+static void	move_wasd(t_game *game, double speed)
 {
 	t_player	*player;
-	double		speed;
 
 	player = &game->player;
-	speed = MOVE_SPEED * SIZE;
 	if (game->keys.w)
 	{
 		player->x += cos(player->angle) * speed;
@@ -31,9 +37,20 @@ int	update_player(t_game *game)
 		player->x += cos(player->angle + PI / 2.0) * speed;
 		player->y += sin(player->angle + PI / 2.0) * speed;
 	}
+}
+
+static void	rotate_player(t_game *game)
+{
 	if (game->keys.left)
-		player->angle -= ROT_SPEED;
+		game->player.angle -= ROT_SPEED;
 	if (game->keys.right)
-		player->angle += ROT_SPEED;
+		game->player.angle += ROT_SPEED;
+	normalize_angle(&game->player.angle);
+}
+
+int	update_player(t_game *game)
+{
+	move_wasd(game, MOVE_SPEED * SIZE);
+	rotate_player(game);
 	return (0);
 }

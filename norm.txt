@@ -1,0 +1,161 @@
+================================================================================
+42 NORM — VERSION 3
+================================================================================
+Official source: https://github.com/42School/norminette
+PDF:            https://s.dou.ua/storage-files/en.norm.pdf
+
+Applies to all Common Core C projects (including cub3D) unless a subject says otherwise.
+Bonus files must pass norm too.
+
+================================================================================
+III.1 DENOMINATION (naming)
+================================================================================
+  - struct names:     start with s_     (e.g. s_game)
+  - typedef names:    start with t_     (e.g. t_game)
+  - union names:      start with u_
+  - enum names:       start with e_
+  - global names:     start with g_
+  - variables/funcs:  lowercase, digits, '_' only (snake_case)
+  - files/dirs:       lowercase, digits, '_' only
+  - no non-ASCII characters
+  - all identifiers in English, mnemonic names
+  - global variables forbidden unless const/static (or project allows)
+  - file must compile to pass norm
+
+================================================================================
+III.2 FORMATTING
+================================================================================
+  - indent with TABS (4-space tab width), NOT spaces
+  - max 25 lines per function (braces NOT counted)
+  - max 80 columns per line (comments count; tab = its space width)
+  - one instruction per line
+  - empty lines must be truly empty (no spaces/tabs)
+  - no trailing spaces/tabs at end of line
+  - no two consecutive spaces
+  - newline after each closing brace or end of control structure
+  - comma/semicolon followed by space (unless end of line)
+  - operators/operands separated by exactly one space
+  - C keywords followed by space EXCEPT type keywords (int, char, etc.) and sizeof
+  - variable declarations aligned on same column within scope
+  - pointer asterisks stick to variable name:  char *str  (not char* str)
+  - one variable declaration per line
+  - no declaration + initialization on same line (except globals/statics/constants)
+  - declarations at start of function
+  - empty line between declarations and rest of function body
+  - no other empty lines inside a function
+  - no multiple assignments (a = b = c)
+  - after if/while/etc. with braces: newline before and after braces
+  - control structures MUST have braces unless body is a single line
+
+  Functions separated by a newline (comment/#define may sit right above function).
+
+  Return example:
+      return (value);
+
+================================================================================
+III.3 FUNCTIONS
+================================================================================
+  - max 4 named parameters
+  - no-arg functions: prototype must use void explicitly
+      int foo(void);
+  - prototype parameters must be named
+  - functions separated by empty line
+  - max 5 variables declared per function
+  - return value in parentheses:  return (0);
+  - single tab between return type and function name:
+      int     my_func(int arg);
+
+================================================================================
+III.4 TYPEDEF, STRUCT, ENUM, UNION
+================================================================================
+  - tab when declaring struct/enum/union
+  - space when declaring variable of struct/enum/union type
+  - typedef struct: normal indentation rules apply
+  - typedef name preceded by tab
+  - struct names indented on same column in scope
+  - cannot declare a struct in a .c file (only in .h)
+
+================================================================================
+III.5 HEADERS (.h files)
+================================================================================
+  - allowed: includes, declarations, defines, prototypes, macros
+  - all includes at top of file
+  - cannot #include a .c file
+  - include guards required:  cub3d.h  ->  CUB3D_H
+  - no unused includes
+  - every include must be justified in .c AND .h
+
+================================================================================
+III.6 42 HEADER (file header comment)
+================================================================================
+  - every .c and .h must start with the standard 42 header block
+  - must include creator login/email, creation date, last update login/date
+  - updated automatically on save (cluster vim/emacs plugins)
+
+================================================================================
+III.7 MACROS & PREPROCESSOR
+================================================================================
+  - #define only for literal/constant values
+  - no #define tricks to bypass norm (human-checked)
+  - standard lib macros OK if project allows
+  - no multiline macros
+  - macro names ALL_CAPS
+  - indent after #if / #ifdef / #ifndef
+
+================================================================================
+III.8 FORBIDDEN
+================================================================================
+  - for
+  - do...while
+  - switch / case
+  - goto
+  - ternary operator  (? :)
+  - VLAs (variable length arrays)
+  - implicit type declarations
+
+================================================================================
+III.9 COMMENTS
+================================================================================
+  - NO comments inside function bodies
+  - comments at end of line or on their own line (outside functions)
+  - comments in English, must be useful
+  - cannot use comments to excuse a bad/overlong function
+
+================================================================================
+III.10 FILES
+================================================================================
+  - cannot #include a .c file
+  - max 5 function definitions per .c file
+
+================================================================================
+III.11 MAKEFILE
+================================================================================
+  - not checked by norminette (checked at eval)
+  - must have: NAME/all, clean, fclean, re
+  - must not relink unnecessarily
+  - multibinary: rule for each binary + combined rule
+  - must auto-compile libft (or other non-system lib) if used
+  - all source files explicitly named in Makefile
+
+================================================================================
+QUICK CHECKLIST (most common failures)
+================================================================================
+  [ ] Tabs, not spaces
+  [ ] Lines <= 80 cols
+  [ ] Functions <= 25 lines (body only)
+  [ ] <= 5 functions per .c file
+  [ ] <= 5 variables per function
+  [ ] <= 4 function parameters
+  [ ] No for / do-while / switch / goto / ternary
+  [ ] No comments inside functions
+  [ ] return (x); with parentheses
+  [ ] Pointer: type *name
+  [ ] Declarations at top, blank line, then code
+  [ ] 42 header on every .c and .h
+  [ ] Include guard on every .h
+
+================================================================================
+HOW WE USE THIS IN THIS PROJECT
+================================================================================
+  Paste norminette output here in chat and we'll fix files manually.
+  Online checker (no install): https://norminette.42.fr

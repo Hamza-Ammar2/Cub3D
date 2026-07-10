@@ -1,104 +1,71 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   handle_keys.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "cub3d.h"
 
 int	handle_rotation(int key, t_game *game)
 {
-	double rot_speed;
-
-	rot_speed = ROT_SPEED; // small value like 0.05
-
 	if (key == KEY_LEFT)
-	{
-		game->player.angle -= rot_speed;
-	}
+		game->player.angle -= ROT_SPEED;
 	else if (key == KEY_RIGHT)
-	{
-		game->player.angle += rot_speed;
-	}
-    else
-    {
-        return (0); // No rotation key pressed
-    }
-
-	// keep angle in range [0, 2π]
+		game->player.angle += ROT_SPEED;
+	else
+		return (0);
 	if (game->player.angle < 0)
-		game->player.angle += 2 * M_PI;
-	if (game->player.angle > 2 * M_PI)
-		game->player.angle -= 2 * M_PI;
+		game->player.angle += 2 * PI;
+	if (game->player.angle > 2 * PI)
+		game->player.angle -= 2 * PI;
+	return (1);
+}
 
+static int	try_move_fb(t_game *game, int key)
+{
+	double	step;
+	double	dir;
+
+	if (key != KEY_W && key != KEY_S)
+		return (0);
+	step = MOVE_SPEED * SIZE;
+	if (key == KEY_W)
+		dir = 1.0;
+	else
+		dir = -1.0;
+	game->player.x += cos(game->player.angle) * step * dir;
+	game->player.y += sin(game->player.angle) * step * dir;
+	return (1);
+}
+
+static int	try_move_lr(t_game *game, int key)
+{
+	double	step;
+	double	dir;
+	double	angle;
+
+	if (key != KEY_A && key != KEY_D)
+		return (0);
+	step = MOVE_SPEED * SIZE;
+	if (key == KEY_D)
+		dir = 1.0;
+	else
+		dir = -1.0;
+	angle = game->player.angle + PI / 2.0;
+	game->player.x += cos(angle) * step * dir;
+	game->player.y += sin(angle) * step * dir;
 	return (1);
 }
 
 int	key_it(int key, t_game *game)
 {
-	double move_step;
-	double new_x = 0;
-	double new_y = 0;
-
-	move_step = MOVE_SPEED * SIZE;
-
-	// Forward / Backward
-	if (key == KEY_W || key == KEY_S)
-	{
-		double dir = (key == KEY_W) ? 1.0 : -1.0;
-
-		new_x = game->player.x + cos(game->player.angle) * move_step * dir;
-		new_y = game->player.y + sin(game->player.angle) * move_step * dir;
-	}
-
-	// Strafing (left/right)
-	if (key == KEY_A || key == KEY_D)
-	{
-		double dir = (key == KEY_D) ? 1.0 : -1.0;
-
-		new_x = game->player.x + cos(game->player.angle + M_PI_2) * move_step * dir;
-		new_y = game->player.y + sin(game->player.angle + M_PI_2) * move_step * dir;
-	}
-    if (new_x == 0 && new_y == 0){
-        return (0);} // No movement key pressed
-	game->player.x = new_x;
-	game->player.y = new_y;
-
-	return (1);
+	if (try_move_fb(game, key))
+		return (1);
+	return (try_move_lr(game, key));
 }
-
-// int	key_it2(int key, t_game *game)
-// {
-// 	if (key == KEY_A)
-// 	{
-// 		data->camera.phis[1] += 0.1;
-// 		return (1);
-// 	}
-// 	if (key == KEY_D)
-// 	{
-// 		data->camera.phis[1] -= 0.1;
-// 		return (1);
-// 	}
-// 	if (key == KEY_W)
-// 	{
-// 		data->camera.phis[0] += 0.1;
-// 		return (1);
-// 	}
-// 	if (key == KEY_S)
-// 	{
-// 		data->camera.phis[0] -= 0.1;
-// 		return (1);
-// 	}
-// 	return (0);
-// }
-
-// int	key_it3(int key, t_game *game)
-// {
-// 	if (key == KEY_Q)
-// 	{
-// 		data->camera.phis[2] += 0.1;
-// 		return (1);
-// 	}
-// 	if (key == KEY_E)
-// 	{
-// 		data->camera.phis[2] -= 0.1;
-// 		return (1);
-// 	}
-// 	return (0);
-// }

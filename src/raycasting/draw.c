@@ -1,80 +1,97 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   draw.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "cub3d.h"
 
+static void	draw_tile(t_game *game, int i, int j)
+{
+	t_rect	rect;
+	int		color;
+
+	rect.x = j * SIZE;
+	rect.y = i * SIZE;
+	rect.width = SIZE;
+	rect.height = SIZE;
+	if (game->config.map[i][j] == '1')
+		color = 0xFFFFFF;
+	else
+		color = 0x000000;
+	draw_rect(game, rect, color);
+}
+
 void	draw_map2d(t_game *game)
 {
-    int i;
-    int j;
+	int	i;
+	int	j;
 
-    i = 0;
-    while (i < game->config.map_height)
-    {
-        j = 0;
-        while (j < game->config.map_width)
-        {
-            if (game->config.map[i][j] == '1')
-                draw_rect(game, (t_rect){.x = j * SIZE, .y = i * SIZE, .width = SIZE, .height = SIZE}, 0xFFFFFF);
-            else
-                draw_rect(game, (t_rect){.x = j * SIZE, .y = i * SIZE, .width = SIZE, .height = SIZE}, 0x000000);
-            j++;
-        }
-        i++;
-    }
+	i = 0;
+	while (i < game->config.map_height)
+	{
+		j = 0;
+		while (j < game->config.map_width)
+		{
+			draw_tile(game, i, j);
+			j++;
+		}
+		i++;
+	}
 }
 
 void	draw_rect(t_game *game, t_rect rect, int color)
 {
-    int i;
-    int j;
+	int	i;
+	int	j;
 
-    i = 0;
-    while (i < rect.height)
-    {
-        j = 0;
-        while (j < rect.width)
-        {
-            put_pixel(&game->frame, rect.x + j, rect.y + i, color);
-            j++;
-        }
-        i++;
-    }
+	i = 0;
+	while (i < rect.height)
+	{
+		j = 0;
+		while (j < rect.width)
+		{
+			put_pixel(&game->frame, rect.x + j, rect.y + i, color);
+			j++;
+		}
+		i++;
+	}
+}
+
+static void	step_line(t_vect *p0, int *err, t_rect *b)
+{
+	if (*err * 2 > -b->height)
+	{
+		*err -= b->height;
+		p0->x += b->x;
+	}
+	if (*err * 2 < b->width)
+	{
+		*err += b->width;
+		p0->y += b->y;
+	}
 }
 
 void	draw_line(t_game *game, t_vect p0, t_vect p1, int color)
 {
-    int	dx;
-	int	dy;
-	int	sx;
-	int	sy;
-	int	err;
-	int	e2;
+	t_rect	b;
+	int		err;
 
-	dx = fabs(p1.x - p0.x);
-	dy = fabs(p1.y - p0.y);
-	if (p0.x < p1.x)
-		sx = 1;
-	else
-		sx = -1;
-	if (p0.y < p1.y)
-		sy = 1;
-	else
-		sy = -1;
-	err = dx - dy;
-	while (1)
+	b.width = fabs(p1.x - p0.x);
+	b.height = fabs(p1.y - p0.y);
+	b.x = 1 - 2 * (p0.x >= p1.x);
+	b.y = 1 - 2 * (p0.y >= p1.y);
+	err = b.width - b.height;
+	while (p0.x != p1.x || p0.y != p1.y)
 	{
 		put_pixel(&game->frame, p0.x, p0.y, color);
-		if (p0.x == p1.x && p0.y == p1.y)
-			break ;
-		e2 = err * 2;
-		if (e2 > -dy)
-		{
-			err = err - dy;
-			p0.x = p0.x + sx;
-		}
-		if (e2 < dx)
-		{
-			err = err + dx;
-			p0.y = p0.y + sy;
-		}
+		step_line(&p0, &err, &b);
 	}
+	put_pixel(&game->frame, p1.x, p1.y, color);
 }

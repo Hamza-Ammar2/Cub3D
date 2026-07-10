@@ -1,4 +1,14 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   game_loop.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "cub3d.h"
 
@@ -18,7 +28,7 @@ void	clear_image(t_img *img)
 
 double	get_time_ms(void)
 {
-	struct timeval tv;
+	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
 	return ((tv.tv_sec * 1000.0) + (tv.tv_usec / 1000.0));
@@ -26,19 +36,20 @@ double	get_time_ms(void)
 
 int	game_loop(void *param)
 {
-	t_game		*game = (t_game *)param;
-	double		now;
-	double		elapsed;
-	double		frame_ms;
+	t_game	*game;
+	double	now;
+	double	elapsed;
+	double	frame_ms;
 
+	game = (t_game *)param;
 	frame_ms = 1000.0 / game->timing.target_fps;
 	now = get_time_ms();
 	elapsed = now - game->timing.last_frame;
 	if (elapsed < frame_ms)
 		return (0);
 	game->timing.last_frame = now;
-    clear_image(&game->frame);
-    update_player(game);
+	clear_image(&game->frame);
+	update_player(game);
 	render_frame(game);
 	return (0);
 }

@@ -1,13 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_map.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
 static int	get_max_width(t_list *map_lines);
 static char	*pad_line(char *src, int width);
 
-/*
-** Convert the collected map rows (t_list) into config.map (char **). Every row
-** is padded with spaces to the width of the longest row so the grid is
-** rectangular, which makes bounds checks and the flood fill trivial.
-*/
 int	build_map(t_game *game, t_list *map_lines)
 {
 	int		height;
@@ -34,7 +41,6 @@ int	build_map(t_game *game, t_list *map_lines)
 	return (0);
 }
 
-/* Length of the longest row, excluding a trailing newline. */
 static int	get_max_width(t_list *map_lines)
 {
 	int		max;
@@ -55,7 +61,6 @@ static int	get_max_width(t_list *map_lines)
 	return (max);
 }
 
-/* Copy src (minus trailing '\n') into a fresh string right-padded to width. */
 static char	*pad_line(char *src, int width)
 {
 	char	*dst;

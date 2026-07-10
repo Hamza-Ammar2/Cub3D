@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_colors.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
 static char	**split_color_fields(char *line)
@@ -39,7 +51,6 @@ static int	finish_color_parse(t_game *game, char **color_fields, int is_floor,
 	return (result);
 }
 
-/* Parse the F and C identifier lines into config.floor/ceiling_color. */
 int	parse_colors(t_game *game, char *line)
 {
 	char	**color_fields;

@@ -1,17 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
-static int	load_tex(t_game *game)
+static void	run_game(t_game *game)
 {
-	int	i;
-
-	i = 0;
-	while (i < 4)
-	{
-		if (load_image(game, &game->textures[i], game->config.tex_path[i]))
-			return (1);
-		i++;
-	}
-	return (0);
+	game->timing.target_fps = 30.0;
+	game->timing.last_frame = get_time_ms();
+	mlx_loop_hook(game->mlx, game_loop, game);
+	mlx_loop(game->mlx);
 }
 
 int	main(int argc, char **argv)
@@ -27,12 +33,9 @@ int	main(int argc, char **argv)
 		return (1);
 	if (init_player(&game))
 		return (1);
-	if (load_tex(&game))
+	if (load_textures(&game))
 		return (1);
-	game.timing.target_fps = 30.0;
-	game.timing.last_frame = get_time_ms();
-	mlx_loop_hook(game.mlx, game_loop, &game);
-	mlx_loop(game.mlx);
+	run_game(&game);
 	free_game(&game);
 	return (0);
 }

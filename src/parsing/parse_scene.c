@@ -1,9 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_scene.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
 static int	read_scene(t_game *game, int fd, t_list **map_lines);
 static int	finish_scene(t_game *game, t_list **map_lines);
 
-/* Reject anything that isn't a "*.cub" file (also rejects NULL and ".cub"). */
 int	check_extension(char *path)
 {
 	int	len;
@@ -16,7 +27,6 @@ int	check_extension(char *path)
 	return (ft_strcmp(path + len - 4, ".cub") != 0);
 }
 
-/* True only when all 4 textures and both colors have been parsed. */
 int	all_config_set(t_game *game)
 {
 	int	i;
@@ -31,11 +41,6 @@ int	all_config_set(t_game *game)
 	return (game->config.floor_set && game->config.ceiling_set);
 }
 
-/*
-** Entry point for parsing the .cub file: check the extension, open the file,
-** read + dispatch every line, then build and validate the map. Owns the fd and
-** the temporary map_lines list.
-*/
 int	parse_scene(t_game *game, char *path)
 {
 	int		fd;
@@ -58,10 +63,6 @@ int	parse_scene(t_game *game, char *path)
 	return (finish_scene(game, &map_lines));
 }
 
-/*
-** Read the file line by line and hand each line to handle_line(). map_started
-** is loop-local state (it only matters while reading).
-*/
 static int	read_scene(t_game *game, int fd, t_list **map_lines)
 {
 	char	*line;
@@ -82,11 +83,6 @@ static int	read_scene(t_game *game, int fd, t_list **map_lines)
 	return (0);
 }
 
-/*
-** Post-read checks: all 6 elements present, a non-empty map, then build the
-** grid and validate it. The map_lines list is disposable once build_map has
-** copied it into config.map.
-*/
 static int	finish_scene(t_game *game, t_list **map_lines)
 {
 	int	ret;

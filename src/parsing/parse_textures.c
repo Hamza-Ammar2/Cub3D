@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_textures.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
 static int	texture_index_from_id(const char *id)
@@ -30,7 +42,6 @@ static int	set_texture_path(t_game *game, char **texture_fields)
 	return (0);
 }
 
-/* Parse the NO / SO / WE / EA identifier lines into config.tex_path[]. */
 int	parse_textures(t_game *game, char *line)
 {
 	char	**texture_fields;

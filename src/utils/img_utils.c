@@ -1,34 +1,39 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   img_utils.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "cub3d.h"
 
 void	draw_img(t_img *frame, t_img *src, t_rect src_rect, t_rect dst)
 {
-	int     i;
-    int     j;
-    int     color;
-    int     src_x;
-    int     src_y;
-    char    *src_pixel;
+	int		i;
+	int		j;
+	int		src_x;
+	int		src_y;
 
-    i = 0;
-    while (i < dst.height)
-    {
-        j = 0;
-        while (j < dst.width)
-        {
-            // FIX: Keep src_x locked to the ray's sample point instead of stretching it
-            src_x = src_rect.x + (j * src_rect.width) / dst.width;
-            
-            src_y = src_rect.y + (i * src_rect.height) / dst.height;
-            src_pixel = src->addr + src_y * src->line_len
-                + src_x * (src->bpp / 8);
-            color = *(unsigned int *)src_pixel;
-            put_pixel(frame, dst.x + j, dst.y + i, color);
-            j++;
-        }
-        i++;
-    }
+	i = 0;
+	while (i < dst.height)
+	{
+		j = 0;
+		while (j < dst.width)
+		{
+			src_x = src_rect.x + (j * src_rect.width) / dst.width;
+			src_y = src_rect.y + (i * src_rect.height) / dst.height;
+			put_pixel(frame, dst.x + j, dst.y + i,
+				*(unsigned int *)(src->addr + src_y * src->line_len
+					+ src_x * (src->bpp / 8)));
+			j++;
+		}
+		i++;
+	}
 }
 
 int	load_image(t_game *game, t_img *img, char *path)

@@ -34,6 +34,8 @@ SRCS		= \
 	src/parsing/handle_line.c \
 	src/init/init_game.c \
 	src/raycasting/raycaster.c \
+	src/raycasting/cast_horizontal.c \
+	src/raycasting/cast_vertical.c \
 	src/raycasting/cast2D.c \
 	src/raycasting/draw.c \
 	src/raycasting/render.c \

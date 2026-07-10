@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_game.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
 static double	start_angle(char dir)
@@ -13,7 +25,13 @@ static double	start_angle(char dir)
 	return (0.0);
 }
 
-/* Boot mlx, create the window + frame image, wire input hooks. */
+static void	bind_hooks(t_game *game)
+{
+	mlx_hook(game->win, 2, 1L << 0, handle_keypress, game);
+	mlx_hook(game->win, 3, 1L << 1, handle_keyrelease, game);
+	mlx_hook(game->win, 17, 1L << 17, handle_close, game);
+}
+
 int	init_game(t_game *game)
 {
 	game->mlx = mlx_init();
@@ -31,13 +49,10 @@ int	init_game(t_game *game)
 		return (error_exit("image data init failed"));
 	game->frame.width = WIN_WIDTH;
 	game->frame.height = WIN_HEIGHT;
-	mlx_hook(game->win, 2, 1L << 0, handle_keypress, game);
-	mlx_hook(game->win, 3, 1L << 1, handle_keyrelease, game);
-	mlx_hook(game->win, 17, 1L << 17, handle_close, game);
+	bind_hooks(game);
 	return (0);
 }
 
-/* Place player from parsed spawn (tile coords -> pixel coords). */
 int	init_player(t_game *game)
 {
 	game->player.x = game->config.start_x * SIZE;
@@ -48,6 +63,14 @@ int	init_player(t_game *game)
 
 int	load_textures(t_game *game)
 {
-	(void)game;
+	int	i;
+
+	i = 0;
+	while (i < 4)
+	{
+		if (load_image(game, &game->textures[i], game->config.tex_path[i]))
+			return (1);
+		i++;
+	}
 	return (0);
 }

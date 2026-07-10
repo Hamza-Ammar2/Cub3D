@@ -1,6 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_utils.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
-/* Return 1 if the line contains only whitespace (a blank line), else 0. */
 int	is_empty_line(char *line)
 {
 	int	i;
@@ -15,7 +26,6 @@ int	is_empty_line(char *line)
 	return (1);
 }
 
-/* Remove a single trailing newline from a line in place; returns the line. */
 char	*strip_newline(char *line)
 {
 	int	length;
@@ -29,7 +39,6 @@ char	*strip_newline(char *line)
 	return (line);
 }
 
-/* Count the strings in a NULL-terminated array (e.g. ft_split output). */
 int	count_words(char **split)
 {
 	int	i;
@@ -42,7 +51,6 @@ int	count_words(char **split)
 	return (i);
 }
 
-/* Return 1 if str is a non-empty run of digits only, else 0. */
 int	is_valid_number(char *str)
 {
 	int	i;

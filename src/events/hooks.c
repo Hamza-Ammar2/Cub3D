@@ -1,6 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   hooks.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
-/* Key pressed: set the matching flag in game->keys (ESC quits immediately). */
 int	handle_keypress(int key, t_game *game)
 {
 	if (!game)
@@ -22,7 +33,6 @@ int	handle_keypress(int key, t_game *game)
 	return (0);
 }
 
-/* Key released: clear the matching flag in game->keys. */
 int	handle_keyrelease(int key, t_game *game)
 {
 	if (!game)
@@ -42,7 +52,6 @@ int	handle_keyrelease(int key, t_game *game)
 	return (0);
 }
 
-/* Red cross on the window frame: clean shutdown. */
 int	handle_close(t_game *game)
 {
 	if (!game)

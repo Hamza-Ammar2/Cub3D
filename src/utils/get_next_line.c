@@ -10,15 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/cub3d.h"
+#include "cub3d.h"
 
-typedef struct s_line
-{
-	char	*str;
-	size_t	len;
-}	t_line;
+static char		g_buf[BUFFER_SIZE];
+static size_t	g_pos;
+static size_t	g_len;
 
-/* Refill the static buffer from fd. Returns bytes read (0 = EOF, <0 = err). */
 static int	refill(int fd, char *buf, size_t *pos, size_t *len)
 {
 	int	r;
@@ -31,8 +28,6 @@ static int	refill(int fd, char *buf, size_t *pos, size_t *len)
 	return (r);
 }
 
-/* Append the next chunk of buf to ln. Returns 1 if a '\n' was reached,
-** 0 if the buffer was consumed without one, -1 on allocation failure. */
 static int	take_chunk(t_line *ln, char *buf, size_t *pos, size_t len)
 {
 	char	*nl;
@@ -53,33 +48,39 @@ static int	take_chunk(t_line *ln, char *buf, size_t *pos, size_t len)
 	return (found);
 }
 
+static int	fill_line(int fd, t_line *ln)
+{
+	int	status;
+
+	status = 0;
+	while (status == 0)
+	{
+		if (g_pos >= g_len)
+		{
+			status = refill(fd, g_buf, &g_pos, &g_len);
+			if (status <= 0)
+				return (status);
+			status = 0;
+		}
+		status = take_chunk(ln, g_buf, &g_pos, g_len);
+	}
+	return (status);
+}
+
 char	*get_next_line(int fd)
 {
-	static char		buf[BUFFER_SIZE];
-	static size_t	pos;
-	static size_t	len;
-	t_line			ln;
-	int				status;
+	t_line	ln;
+	int		status;
 
 	if (fd < 0)
 		return (NULL);
 	ln.str = NULL;
 	ln.len = 0;
-	status = 0;
-	while (status == 0)
-	{
-		if (pos >= len)
-		{
-			status = refill(fd, buf, &pos, &len);
-			if (status < 0)
-				return (free(ln.str), NULL);
-			if (status == 0)
-				break ;
-			status = 0;
-		}
-		status = take_chunk(&ln, buf, &pos, len);
-	}
+	status = fill_line(fd, &ln);
 	if (status < 0)
-		return (free(ln.str), NULL);
+	{
+		free(ln.str);
+		return (NULL);
+	}
 	return (ln.str);
 }

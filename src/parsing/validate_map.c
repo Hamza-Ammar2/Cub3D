@@ -1,13 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   validate_map.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
+/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
 static int	check_chars(t_game *game, int *player_count);
 static int	check_cell(t_game *game, int x, int y, int *pc);
 static void	set_player(t_game *game, int x, int y);
 
-/*
-** Validate the built grid: only legal chars + exactly one player start
-** (check_chars), then confirm the map is sealed by walls (check_closed).
-*/
 int	validate_map(t_game *game)
 {
 	int	player_count;
@@ -22,7 +30,6 @@ int	validate_map(t_game *game)
 	return (0);
 }
 
-/* Walk every cell, validating the character and counting player starts. */
 static int	check_chars(t_game *game, int *player_count)
 {
 	int	y;
@@ -44,7 +51,6 @@ static int	check_chars(t_game *game, int *player_count)
 	return (0);
 }
 
-/* Classify one cell: floor/wall/space ok, N/S/E/W is a player, else error. */
 static int	check_cell(t_game *game, int x, int y, int *pc)
 {
 	char	c;
@@ -60,7 +66,6 @@ static int	check_cell(t_game *game, int x, int y, int *pc)
 	return (0);
 }
 
-/* Record the spawn (centered on the tile) and replace it with floor. */
 static void	set_player(t_game *game, int x, int y)
 {
 	game->config.start_x = x + 0.5;
