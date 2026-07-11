@@ -15,7 +15,8 @@ SRC_DIR		= src
 OBJ_DIR		= obj
 INC_DIR		= includes
 LIBFT_DIR	= libft
-MLX_DIR		= minilibx-linux
+MLX_DIR		= ../minilibx-linux
+MLX			= $(MLX_DIR)/libmlx.a
 
 # ---------------------------------------------------------------------------- #
 #   Sources                                                                     #
@@ -56,20 +57,21 @@ OBJS		= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 #   Libraries                                                                   #
 # ---------------------------------------------------------------------------- #
 LIBFT		= $(LIBFT_DIR)/libft.a
-# Linux (X11) linking against a SYSTEM-installed MiniLibX (headers in
-# /usr/local/include, libmlx.a in /usr/local/lib). The local minilibx/mlx.h
-# wrapper uses #include_next to reach the system header.
-#MLX_FLAGS	= -L/usr/local/lib -lmlx -lXext -lX11 -lm
-MLX_FLAGS	= -L$(MLX_DIR) -lmlx -lXext -lX11 -lm -lz
+MLX_FLAGS	= $(MLX) -lXext -lX11 -lm -lz
 INCLUDES	= -I$(INC_DIR) -I$(LIBFT_DIR) -I$(MLX_DIR)
 
 # ---------------------------------------------------------------------------- #
 #   Rules                                                                       #
 # ---------------------------------------------------------------------------- #
-all: $(NAME)
+all: $(LIBFT) $(MLX) $(NAME)
 
-$(NAME): $(LIBFT) $(OBJS)
+$(NAME): $(OBJS) $(LIBFT) $(MLX)
 	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(MLX_FLAGS) -o $(NAME)
+
+$(MLX):
+	@ln -sf mlx.h $(MLX_DIR)/xvar.h
+	@ln -sf ../mlx.h $(MLX_DIR)/test/xvar.h
+	@if [ ! -f $(MLX) ]; then $(MAKE) -C $(MLX_DIR); fi
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
@@ -84,6 +86,7 @@ bonus: all
 clean:
 	$(RM) -r $(OBJ_DIR)
 	$(MAKE) -C $(LIBFT_DIR) clean
+	$(MAKE) -C $(MLX_DIR) clean
 
 fclean: clean
 	$(RM) $(NAME)
