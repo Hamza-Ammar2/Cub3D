@@ -1,0 +1,13 @@
+{
+	"C_Cpp.default.includePath": [
+		"${workspaceFolder}/includes",
+		"${workspaceFolder}/libft",
+		"${workspaceFolder}/../minilibx-linux"
+	],
+	"C_Cpp.errorSquiggles": "enabled",
+	"C_Cpp.intelliSenseEngine": "default",
+	"files.associations": {
+		"cub3d.h": "c",
+		"*.h": "c"
+	}
+}

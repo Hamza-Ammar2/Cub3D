@@ -1,0 +1,28 @@
+{
+	"configurations": [
+		{
+			"name": "cub3D",
+			"includePath": [
+				"${workspaceFolder}/includes",
+				"${workspaceFolder}/libft",
+				"${workspaceFolder}/../minilibx-linux",
+				"${workspaceFolder}/**"
+			],
+			"defines": [
+				"BUFFER_SIZE=4096"
+			],
+			"compilerPath": "",
+			"cStandard": "c99",
+			"cppStandard": "c++17",
+			"intelliSenseMode": "linux-gcc-x64",
+			"browse": {
+				"path": [
+					"${workspaceFolder}",
+					"${workspaceFolder}/../minilibx-linux"
+				],
+				"limitSymbolsToIncludedHeaders": false
+			}
+		}
+	],
+	"version": 4
+}
