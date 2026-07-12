@@ -29,7 +29,7 @@ static int	get_wall_side(t_game *game, t_vect end, double ray_angle)
 	return (NORTH);
 }
 
-static	void		fix_tex_height(t_rect *uv, int line_h, int tex_height)
+static	void	fix_tex_height(t_rect *uv, int line_h, int tex_height)
 {
 	if (line_h > WIN_HEIGHT)
 	{
