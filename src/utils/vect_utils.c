@@ -24,7 +24,7 @@ double	get_distance(t_vect start, t_vect end)
 
 int	get_map_index(double v)
 {
-	return ((int)v / SIZE);
+	return ((int)(v / SIZE));
 }
 
 void	normalize_angle(double *angle)

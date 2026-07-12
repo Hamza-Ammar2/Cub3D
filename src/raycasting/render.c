@@ -47,9 +47,11 @@ void	draw_column(t_game *game, t_rect uv, int x, int line_h)
 
 	start_y = (WIN_HEIGHT - line_h) / 2;
 	rect.x = x;
-	rect.y = start_y;
+	rect.y = start_y * (line_h < WIN_HEIGHT);
 	rect.width = WIN_WIDTH / NUM_RAYS;
 	rect.height = line_h;
+	if (line_h > WIN_HEIGHT)
+		rect.height = WIN_HEIGHT;
 	draw_img(&game->frame, &game->textures[game->config.cur_side], uv, rect);
 	draw_ceiling(game, x, start_y);
 	draw_floor(game, x, start_y, line_h);

@@ -12,31 +12,57 @@
 
 #include "cub3d.h"
 
-static void	move_wasd(t_game *game, double speed)
+static void	collide(t_game *game, double dx, double dy)
 {
-	t_player	*player;
+	int		i;
+	int		j;
 
-	player = &game->player;
+	i = get_map_index(game->player.y);
+	j = get_map_index(game->player.x);
+	if (game->config.map[i][get_map_index(game->player.x + dx)] == '1')
+	{
+		if (dx > 0)
+			game->player.x = (double) j * SIZE + SIZE - 1;
+		else
+			game->player.x = (double) j * SIZE + 1;
+	}
+	else
+		game->player.x += dx;
+	j = get_map_index(game->player.x);
+	if (game->config.map[get_map_index(game->player.y + dy)][j] == '1')
+	{
+		if (dy > 0)
+			game->player.y = (double) i * SIZE + SIZE - 1;
+		else
+			game->player.y = (double) i * SIZE + 1;
+	}
+	else
+		game->player.y += dy;
+}
+
+static void	move_wasd(t_game *game, double speed, double dx, double dy)
+{
 	if (game->keys.w)
 	{
-		player->x += cos(player->angle) * speed;
-		player->y += sin(player->angle) * speed;
+		dx += cos(game->player.angle) * speed;
+		dy += sin(game->player.angle) * speed;
 	}
 	if (game->keys.s)
 	{
-		player->x -= cos(player->angle) * speed;
-		player->y -= sin(player->angle) * speed;
+		dx -= cos(game->player.angle) * speed;
+		dy -= sin(game->player.angle) * speed;
 	}
 	if (game->keys.a)
 	{
-		player->x -= cos(player->angle + PI / 2.0) * speed;
-		player->y -= sin(player->angle + PI / 2.0) * speed;
+		dx -= cos(game->player.angle + PI / 2.0) * speed;
+		dy -= sin(game->player.angle + PI / 2.0) * speed;
 	}
 	if (game->keys.d)
 	{
-		player->x += cos(player->angle + PI / 2.0) * speed;
-		player->y += sin(player->angle + PI / 2.0) * speed;
+		dx += cos(game->player.angle + PI / 2.0) * speed;
+		dy += sin(game->player.angle + PI / 2.0) * speed;
 	}
+	collide(game, dx, dy);
 }
 
 static void	rotate_player(t_game *game)
@@ -50,7 +76,7 @@ static void	rotate_player(t_game *game)
 
 int	update_player(t_game *game)
 {
-	move_wasd(game, MOVE_SPEED * SIZE);
+	move_wasd(game, MOVE_SPEED * SIZE, 0, 0);
 	rotate_player(game);
 	return (0);
 }

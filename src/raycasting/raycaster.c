@@ -12,7 +12,7 @@
 
 #include "cub3d.h"
 
-int	get_wall_side(t_game *game, t_vect end, double ray_angle)
+static int	get_wall_side(t_game *game, t_vect end, double ray_angle)
 {
 	double	eps;
 
@@ -29,7 +29,21 @@ int	get_wall_side(t_game *game, t_vect end, double ray_angle)
 	return (NORTH);
 }
 
-t_rect	getuv_rect(t_game *game, t_vect end, double ray_angle)
+static	void		fix_tex_height(t_rect *uv, int line_h, int tex_height)
+{
+	if (line_h > WIN_HEIGHT)
+	{
+		uv->y = (int)(((line_h - WIN_HEIGHT) / 2.0) * tex_height / line_h);
+		uv->height = tex_height - 2 * uv->y;
+	}
+	else
+	{
+		uv->y = 0;
+		uv->height = tex_height;
+	}
+}
+
+static t_rect	getuv_rect(t_game *game, t_vect end, double ray_angle, int line_h)
 {
 	t_rect	uv;
 	int		side;
@@ -45,6 +59,7 @@ t_rect	getuv_rect(t_game *game, t_vect end, double ray_angle)
 	if (side == WEST)
 		uv.x = game->textures[side].width - uv.x - 1;
 	uv.y = 0;
+	fix_tex_height(&uv, line_h, game->textures[side].height);
 	game->config.cur_side = side;
 	return (uv);
 }
@@ -65,7 +80,7 @@ void	cast_rays(t_game *game)
 		dist = get_distance((t_vect){game->player.x, game->player.y}, ray_end);
 		dist *= cos(ray_angle - game->player.angle);
 		line_h = (int)(WIN_HEIGHT * SIZE / dist);
-		draw_column(game, getuv_rect(game, ray_end, ray_angle),
+		draw_column(game, getuv_rect(game, ray_end, ray_angle, line_h),
 			i * (WIN_WIDTH / NUM_RAYS), line_h);
 		ray_angle += FOV_SCALE / NUM_RAYS;
 		i++;
