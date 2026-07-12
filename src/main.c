@@ -20,6 +20,12 @@ static void	run_game(t_game *game)
 	mlx_loop(game->mlx);
 }
 
+static int	fail(t_game *game)
+{
+	free_game(game);
+	return (1);
+}
+
 int	main(int argc, char **argv)
 {
 	t_game	game;
@@ -28,13 +34,13 @@ int	main(int argc, char **argv)
 		return (error_exit("usage: ./cub3D <scene.cub>"));
 	ft_bzero(&game, sizeof(t_game));
 	if (parse_scene(&game, argv[1]))
-		return (1);
+		return (fail(&game));
 	if (init_game(&game))
-		return (1);
+		return (fail(&game));
 	if (init_player(&game))
-		return (1);
+		return (fail(&game));
 	if (load_textures(&game))
-		return (1);
+		return (fail(&game));
 	run_game(&game);
 	free_game(&game);
 	return (0);

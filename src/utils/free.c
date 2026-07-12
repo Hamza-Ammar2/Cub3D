@@ -51,12 +51,28 @@ static void	free_map(t_game *game)
 	free(game->config.map);
 }
 
+static void	free_imgs(t_game *game)
+{
+	int	i;
+
+	if (!game->mlx)
+		return ;
+	i = 0;
+	while (i < 4)
+	{
+		if (game->textures[i].ptr)
+			mlx_destroy_image(game->mlx, game->textures[i].ptr);
+		i++;
+	}
+	if (game->frame.ptr)
+		mlx_destroy_image(game->mlx, game->frame.ptr);
+}
+
 void	free_game(t_game *game)
 {
 	if (!game)
 		return ;
-	if (game->frame.ptr && game->mlx)
-		mlx_destroy_image(game->mlx, game->frame.ptr);
+	free_imgs(game);
 	if (game->win && game->mlx)
 		mlx_destroy_window(game->mlx, game->win);
 	if (game->mlx)
