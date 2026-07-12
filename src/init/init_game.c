@@ -47,8 +47,6 @@ int	init_game(t_game *game)
 			&game->frame.line_len, &game->frame.endian);
 	if (!game->frame.addr)
 		return (error_exit("image data init failed"));
-	game->frame.width = WIN_WIDTH;
-	game->frame.height = WIN_HEIGHT;
 	bind_hooks(game);
 	return (0);
 }

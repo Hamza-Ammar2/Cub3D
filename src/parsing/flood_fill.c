@@ -27,7 +27,6 @@ int	check_closed(t_game *game)
 	flood.map = copy;
 	flood.width = game->config.map_width;
 	flood.height = game->config.map_height;
-	flood.leaked = 0;
 	if (scan_map(&flood))
 	{
 		free_split(copy);

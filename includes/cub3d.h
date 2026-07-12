@@ -137,22 +137,11 @@ typedef struct s_game
 	t_timing	timing;
 }	t_game;
 
-typedef struct s_parser
-{
-	t_game	*game;
-	int		fd;
-	int		line_no;
-	int		in_map;
-	int		seen;
-	t_list	*map_lines;
-}	t_parser;
-
 typedef struct s_flood
 {
 	char	**map;
 	int		width;
 	int		height;
-	int		leaked;
 }	t_flood;
 
 typedef struct s_line
@@ -192,15 +181,11 @@ t_vect	get_ray_end(t_game *game, double ray_angle);
 void	draw_img(t_img *frame, t_img *src, t_rect src_rect, t_rect dst);
 
 void	draw_rect(t_game *game, t_rect rect, int color);
-void	draw_line(t_game *game, t_vect p0, t_vect p1, int color);
-void	draw_map2d(t_game *game);
 
 int		handle_keypress(int key, t_game *game);
 int		handle_keyrelease(int key, t_game *game);
 int		handle_close(t_game *game);
 int		update_player(t_game *game);
-int		key_it(int key, t_game *game);
-int		handle_rotation(int key, t_game *game);
 void	normalize_angle(double *angle);
 
 int		error_exit(char *msg);

@@ -43,7 +43,6 @@ SRCS		= \
 	src/events/hooks.c \
 	src/utils/errors.c \
 	src/utils/game_loop.c \
-	src/utils/handle_keys.c \
 	src/utils/vect_utils.c \
 	src/utils/free.c \
 	src/utils/get_next_line.c \
