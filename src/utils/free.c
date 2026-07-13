@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free.c                                        :+:      :+:    :+:   */
+/*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
-/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*   Created: 2026/07/13 12:08:34 by haammar           #+#    #+#             */
+/*   Updated: 2026/07/13 12:08:34 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,10 @@ void	free_game(t_game *game)
 	if (game->win && game->mlx)
 		mlx_destroy_window(game->mlx, game->win);
 	if (game->mlx)
+	{
 		mlx_destroy_display(game->mlx);
+		free(game->mlx);
+	}
 	free_map(game);
 	free_textures(game);
 	ft_bzero(game, sizeof(*game));
