@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 20:39:11 by haammar           #+#    #+#             */
-/*   Updated: 2026/07/13 11:27:39 by haammar          ###   ########.fr       */
+/*   Updated: 2026/07/13 12:03:47 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,23 @@ static char	*iterread(int fd, char **buff, size_t *start, size_t *end)
 	}
 }
 
+static int	dumb(char **buff, int fd)
+{
+	if (fd < 0)
+	{
+		if (*buff)
+			free(*buff);
+		return (0);
+	}
+	if (!*buff)
+	{
+		*buff = malloc(sizeof(char) * BUFFER_SIZE);
+		if (!*buff)
+			return (0);
+	}
+	return (1);
+}
+
 char	*get_next_line(int fd)
 {
 	static char		*buff;
@@ -71,12 +88,8 @@ char	*get_next_line(int fd)
 	char			*dup;
 	char			*s;
 
-	if (!buff)
-	{
-		buff = malloc(sizeof(char) * BUFFER_SIZE);
-		if (!buff)
-			return (0);
-	}
+	if (!dumb(&buff, fd))
+		return (0);
 	if (end > start)
 	{
 		s = find_char(buff + start, '\n', end - start);

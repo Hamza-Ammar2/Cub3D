@@ -58,6 +58,7 @@ int	parse_scene(t_game *game, char *path)
 	if (status)
 	{
 		ft_lstclear(&map_lines, free);
+		get_next_line(-1);
 		return (1);
 	}
 	return (finish_scene(game, &map_lines));
