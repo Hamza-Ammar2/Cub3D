@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   raycaster.c                                   :+:      :+:    :+:   */
+/*   raycaster.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lukep <lukep@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/10 18:30:00 by lukep             #+#    #+#             */
-/*   Updated: 2026/07/10 18:30:00 by lukep            ###   ########.fr       */
+/*   Created: 2026/07/13 11:31:24 by haammar           #+#    #+#             */
+/*   Updated: 2026/07/13 11:31:24 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static int	get_wall_side(t_game *game, t_vect end, double ray_angle)
 	return (NORTH);
 }
 
-static	void	fix_tex_height(t_rect *uv, int line_h, int tex_height)
+static void	fix_tex_height(t_rect *uv, int line_h, int tex_height)
 {
 	if (line_h > WIN_HEIGHT)
 	{
@@ -43,7 +43,8 @@ static	void	fix_tex_height(t_rect *uv, int line_h, int tex_height)
 	}
 }
 
-static t_rect	getuv_rect(t_game *game, t_vect end, double ray_angle, int line_h)
+static t_rect	getuv_rect(t_game *game, t_vect end, double ray_angle,
+		int line_h)
 {
 	t_rect	uv;
 	int		side;

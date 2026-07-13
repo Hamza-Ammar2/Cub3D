@@ -1,4 +1,16 @@
 # **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: haammar <haammar@student.42.fr>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2026/07/13 11:36:39 by haammar           #+#    #+#              #
+#    Updated: 2026/07/13 11:36:39 by haammar          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+# **************************************************************************** #
 #                                   cub3D                                     #
 # **************************************************************************** #
 
@@ -58,8 +70,8 @@ LIBFT		= $(LIBFT_DIR)/libft.a
 # Linux (X11) linking against a SYSTEM-installed MiniLibX (headers in
 # /usr/local/include, libmlx.a in /usr/local/lib). The local minilibx/mlx.h
 # wrapper uses #include_next to reach the system header.
-#MLX_FLAGS	= -L/usr/local/lib -lmlx -lXext -lX11 -lm
-MLX_FLAGS	= -L$(MLX_DIR) -lmlx -lXext -lX11 -lm -lz
+MLX_FLAGS	= -L/usr/local/lib -lmlx -lXext -lX11 -lm
+#MLX_FLAGS	= -L$(MLX_DIR) -lmlx -lXext -lX11 -lm -lz
 INCLUDES	= -I$(INC_DIR) -I$(LIBFT_DIR) -I$(MLX_DIR)
 
 # ---------------------------------------------------------------------------- #

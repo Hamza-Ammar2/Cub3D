@@ -14,7 +14,7 @@
 # define CUB3D_H
 
 # include "../libft/libft.h"
-# include <../minilibx-linux/mlx.h>
+# include <mlx.h>
 # include <math.h>
 # include <fcntl.h>
 # include <stdio.h>
@@ -27,6 +27,7 @@
 # define WIN_TITLE "cub3D"
 
 # define BUFFER_SIZE 4096
+
 
 # define SIZE 64
 
@@ -200,7 +201,7 @@ void	clear_image(t_img *img);
 int		load_image(t_game *game, t_img *img, char *path);
 
 char	*get_next_line(int fd);
-char	*append(char *s1, char *s2, size_t l1, size_t l2);
 char	*find_char(char *s, char c, size_t len);
+char	*append(char *s1, char *s2, size_t l1, size_t l2);
 
 #endif
