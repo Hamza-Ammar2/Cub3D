@@ -67,9 +67,11 @@ static int	read_scene(t_game *game, int fd, t_list **map_lines)
 {
 	char	*line;
 	int		map_started;
+	t_gnl	gnl;
 
 	map_started = 0;
-	line = get_next_line(fd);
+	ft_bzero(&gnl, sizeof(gnl));
+	line = get_next_line(fd, &gnl);
 	while (line != NULL)
 	{
 		if (handle_line(game, line, &map_started, map_lines))
@@ -78,7 +80,7 @@ static int	read_scene(t_game *game, int fd, t_list **map_lines)
 			return (1);
 		}
 		free(line);
-		line = get_next_line(fd);
+		line = get_next_line(fd, &gnl);
 	}
 	return (0);
 }

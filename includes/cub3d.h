@@ -28,6 +28,12 @@
 
 # define BUFFER_SIZE 4096
 
+typedef struct s_gnl
+{
+	char	buf[BUFFER_SIZE];
+	size_t	start;
+	size_t	end;
+}	t_gnl;
 
 # define SIZE 64
 
@@ -200,7 +206,7 @@ double	get_time_ms(void);
 void	clear_image(t_img *img);
 int		load_image(t_game *game, t_img *img, char *path);
 
-char	*get_next_line(int fd);
+char	*get_next_line(int fd, t_gnl *gnl);
 char	*find_char(char *s, char c, size_t len);
 char	*append(char *s1, char *s2, size_t l1, size_t l2);
 

@@ -12,82 +12,70 @@
 
 #include "cub3d.h"
 
-static char	*clean(int l, char **buff, char *dup)
+static char	*clean(int l, char *dup)
 {
-	if (l > 0)
-		return (dup);
-	free(*buff);
-	*buff = 0;
 	if (l < 0)
 		return (free(dup), (char *) 0);
 	return (dup);
 }
 
-static char	*nc(char *dup, char **buff, size_t *start, size_t *end)
+static char	*nc(char *dup, t_gnl *gnl)
 {
 	if (dup)
 		return (dup);
-	*start = 0;
-	*end = 0;
-	free(*buff);
-	*buff = 0;
+	gnl->start = 0;
+	gnl->end = 0;
 	return ((char *) 0);
 }
 
-static char	*iterread(int fd, char **buff, size_t *start, size_t *end)
+static char	*iterread(int fd, t_gnl *gnl)
 {
 	int		l;
 	size_t	dl;
 	char	*s;
 	char	*dup;
 
-	dl = *end - *start;
+	dl = gnl->end - gnl->start;
 	dup = 0;
-	if (*end > *start)
-		dup = append(0, *buff + *start, 0, *end - *start);
-	if (*end > *start && !dup)
-		return (*start = 0, *end = 0, clean(0, buff, dup));
+	if (gnl->end > gnl->start)
+		dup = append(0, gnl->buf + gnl->start, 0, gnl->end - gnl->start);
+	if (gnl->end > gnl->start && !dup)
+		return (gnl->start = 0, gnl->end = 0, clean(0, dup));
 	while (1)
 	{
-		l = read(fd, *buff, BUFFER_SIZE);
+		l = read(fd, gnl->buf, BUFFER_SIZE);
 		if (l <= 0)
-			return (*start = 0, *end = 0, clean(l, buff, dup));
-		s = find_char(*buff, '\n', l);
+			return (gnl->start = 0, gnl->end = 0, clean(l, dup));
+		s = find_char(gnl->buf, '\n', l);
 		if (s)
-			return (*start = 1 + (size_t)(s - *buff),
-				*end = l, nc(append(dup, *buff, dl, *start), buff, start, end));
-		dup = append(dup, *buff, dl, l);
+			return (gnl->start = 1 + (size_t)(s - gnl->buf),
+				gnl->end = l, nc(append(dup, gnl->buf, dl, gnl->start), gnl));
+		dup = append(dup, gnl->buf, dl, l);
 		if (!dup)
-			return (*start = 0, *end = 0, clean(0, buff, dup));
+			return (gnl->start = 0, gnl->end = 0, clean(0, dup));
 		dl += l;
 	}
 }
 
-char	*get_next_line(int fd)
+char	*get_next_line(int fd, t_gnl *gnl)
 {
-	static char		*buff;
-	static size_t	start;
-	static size_t	end;
-	char			*dup;
-	char			*s;
+	char	*dup;
+	char	*s;
 
-	if (!buff)
+	if (fd < 0 || BUFFER_SIZE <= 0 || !gnl)
+		return (0);
+	if (gnl->end > gnl->start)
 	{
-		buff = malloc(sizeof(char) * BUFFER_SIZE);
-		if (!buff)
-			return (0);
-	}
-	if (end > start)
-	{
-		s = find_char(buff + start, '\n', end - start);
+		s = find_char(gnl->buf + gnl->start, '\n', gnl->end - gnl->start);
 		if (s)
 		{
-			dup = append(0, buff + start, 0, (size_t)(s - (buff + start)) + 1);
-			start = 1 + (size_t)(s - buff);
+			dup = append(0, gnl->buf + gnl->start, 0,
+					(size_t)(s - (gnl->buf + gnl->start)) + 1);
+			gnl->start = 1 + (size_t)(s - gnl->buf);
 			if (!dup)
-				return (start = 0, end = 0, clean(0, &buff, dup));
+				return (gnl->start = 0, gnl->end = 0, clean(0, dup));
 			return (dup);
 		}
 	}
-	return (iterread(fd, &buff, &start, &end));
+	return (iterread(fd, gnl));
 }
