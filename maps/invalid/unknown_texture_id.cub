@@ -1,0 +1,10 @@
+XX ./textures/rooms/north.xpm
+SO ./textures/rooms/south.xpm
+WE ./textures/rooms/west.xpm
+EA ./textures/rooms/east.xpm
+F 220,100,0
+C 225,30,0
+
+111111
+100N01
+111111
